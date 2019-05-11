@@ -82,7 +82,7 @@ $config['url_suffix'] = '';
   |
  */
 //$config['language']	= 'english';//default
-$config['language'] = 'portuguese';
+$config['language'] = 'english';
 
 /*
   |--------------------------------------------------------------------------

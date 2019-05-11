@@ -11,7 +11,7 @@
  *
  * @author fulvi
  */
-class base extends CI_Model {
+class BM_Model extends CI_Model {
 
     private const DEFAULT_DIRECTION = 'ASC';
     private const TABLE_NAME = NULL;
@@ -27,12 +27,39 @@ class base extends CI_Model {
         $this->db->from(static::TABLE_NAME);
     }
 
-    public function replace(array $key, array $new_values, array $old_values) {
-        
+    public function replace(array $where, string $key, array $new_values, array $old_values) {
+        $arr_to_delete = array_diff($new_values, $old_values);
+        $arr_to_insert = array_diff($old_values, $new_values);
+        $this->db->trans_start();
+
+        //delete
+        $this->db->where($where);
+        $this->db->where_in($key, $arr_to_delete);
+        $this->db->delete(static::TABLE_NAME);
+        $this->db->flush_cache();
+
+        //insert
+        foreach ($arr_to_insert as $value) {
+            $this->add(array_merge($where, [$key => $value]));
+        }
+
+        $this->db->trans_complete();
+        if ($this->db->trans_status() === FALSE) {
+            // generate an error... or use the log_message() function to log your error
+            log_message('error', 'Query excuted whit error:' . $this->db->last_query());
+            log_message('error', $this->db->error());
+            return FALSE;
+        }
+        return TRUE;
     }
 
     public function del($where) {
-        $result = $this->db->delete(static::TABLE_NAME, $where);
+        if (!is_array($where)) {
+            $this->db->where($this->db->primary(static::TABLE_NAME), $where);
+            $result = $this->db->delete(static::TABLE_NAME);
+        } else {
+            $result = $this->db->delete(static::TABLE_NAME, $where);
+        }
         log_message('debug', $this->db->last_query());
         return $result;
     }
@@ -79,13 +106,14 @@ class base extends CI_Model {
         return $this->list($limit, $offset, $oreder_by, $group_by);
     }
 
-    public function domain_list(array $filds, $oreder_by = NULL, $group_by = null): array {
+    public function domain_list(array $fields, $oreder_by = NULL, $group_by = null): array {
         $limit = $this->count_all;
         $offset = 0;
         $result = [];
-        foreach ($filds as $fild) {
+        foreach ($fields as $fild) {
             $result[] = self::get_unique_fild_name($fild);
         }
+        $this->db->distinct(TRUE);
         $this->__prepare_select($result);
         $this->__add_group_by($group_by);
         $this->__add_oreder_by($oreder_by);
@@ -119,9 +147,15 @@ class base extends CI_Model {
         $this->db->start_cache();
         foreach ($tables as $value) {
             if (is_array($value)) {
+                if ($this->db->field_exists($value['on'], static::TABLE_NAME)) {
+                    $value['on'] = static::TABLE_NAME . '.' . $value['on'] . '_' . $value['table'] . ' = ' . $value['table'] . '.' . $value['on'];
+                }
                 $this->db->select(self::list_unique_filds($value['table'], TRUE));
                 $this->db->join($value['table'], $value['on'], $value['type']);
             } elseif (is_object($value)) {
+                if ($this->db->field_exists($value->on, static::TABLE_NAME)) {
+                    $value->on = static::TABLE_NAME . '.' . $value->on . '_' . $value->table . ' = ' . $value->table . '.' . $value->on;
+                }
                 $this->db->select(self::list_unique_filds($value->table, TRUE));
                 $this->db->join($value->table, $value->on, $value->type);
             }
