@@ -13,40 +13,67 @@
  */
 class BM_Controler extends CI_Controller {
 
-    private const LINKS = [];
+    public const LINKS = [];
 
-    private $model;
+    public $view_sequece = [
+        'default/start_html_head',
+        'default/head',
+        'default/start_head_body',
+        'default/nav_bar',
+        'default/sub_nav_bar',
+        'default/main',
+        'default/extra',
+        'default/footer',
+        'default/javascript',
+        'default/end_html_body',
+    ];
     var $data = [];
+    var $group_by, $order_by, $limit, $off_set;
 
-    public function __construct(): void {
+    public function __construct() {
         parent::__construct();
-        $this->load->model('base');
-        $this->model = $this->base;
+        $this->lang->load('controller/' . static::class, $this->config->item('language'));
+        $this->lang->load('controller/BM_Controller', $this->config->item('language'));
     }
 
-    protected function get_model() {
-        return $this->model;
+    public function set_model($model) {
+        $this->load->model($model, 'model');
     }
 
+    protected function get_data($hook, $data): array {
+        return $data;
+    }
+
+    public function show_list(array $data) {
+        foreach ($this->view_sequece as $value) {
+                $this->load->view($value, $data);
+        }
+    }
+    
     public function index() {
-        $off_set = $this->input->segment(3, 0);
-        $limit = ($this->input->post('limit') ?? $this->config->item('per_page'));
-        $order_by = ($this->input->post('oreder_by', TRUE) ?? NULL);
-        $group_by = ($this->input->post('group_by', TRUE) ?? NULL);
+        $this->off_set = $this->uri->segment(3, 0);
+        $this->limit = ($this->input->post('limit') ?? $this->config->item('per_page'));
+        $this->order_by = ($this->input->post('oreder_by', TRUE) ?? NULL);
+        $this->group_by = ($this->input->post('group_by', TRUE) ?? NULL);
         if (empty($this->input->post())) {
             //lista
-            $this->data = array_merge($this->data, ['lista' => $this->model->list($limit, $off_set, $order_by, $group_by)]);
+            $this->data = $this->get_data('lista', $this->data);
+            if (isset($this->model)) {
+                $this->data = array_merge($this->data, ['lista' => $this->model->list($this->limit, $this->off_set, $this->order_by, $this->group_by)]);
+            } else {
+                $this->data = array_merge($this->data, ['lista' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
+            }
         } else {
             $this->data = array_merge($this->input->post(null, TRUE), $this->data);
             //busca
             $this->data = $this->get_data('busca', $this->data);
-            $this->data = array_merge($this->data, ['busca' => $this->model->search($this->data, $limit, $off_set, $order_by, $group_by)]);
+            if (isset($this->model)) {
+                $this->data = array_merge($this->data, ['busca' => $this->model->search($this->data, $this->limit, $this->off_set, $this->order_by, $this->group_by)]);
+            } else {
+                $this->data = array_merge($this->data, ['busca' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
+            }
         }
-    }
-
-    protected function get_data($hook, $data): array {
-//        to override
-        //hooks [busca,]
+        $this->show_list($this->data);
     }
 
     public function modify() {
@@ -55,23 +82,34 @@ class BM_Controler extends CI_Controller {
                 //seleciona
                 $this->data = $this->get_data('seleciona', $this->data);
                 $this->data = array_merge(['hidden_filds' => ['id' => $this->input->segment(3)]], $this->data);
-//                $this->model->search
+                //show form
+            } else {
+                
             }
-            //show form
         } else {
-            $id = ($this->input->post('id') ?? false);
-            if ($id) {
+            if (($this->input->post('id', TRUE) ?? false)) {
+                $this->data = array_merge($this->input->post(null, TRUE), $this->data);
                 //altera
                 $this->data = $this->get_data('altera', $this->data);
 //                $this->model->upd
+                if (isset($this->model)) {
+                    $this->data = array_merge($this->data, ['altera' => $this->model->upd()]);
+                } else {
+                    $this->data = array_merge($this->data, ['altera' => '' /* $this->lang->line('') */]);
+                }
             } else {
+                $this->data = array_merge($this->input->post(null, TRUE), $this->data);
                 //cria
                 $this->data = $this->get_data('cria', $this->data);
 //                $this->model->add
+                if (isset($this->model)) {
+                    $this->data = array_merge($this->data, ['cria' => $this->model->upd()]);
+                } else {
+                    $this->data = array_merge($this->data, ['cria' => '' /* $this->lang->line('') */]);
+                }
             }
             //apaga cache (index e modify)
-            //show list
+            $this->show_list($this->data);
         }
     }
-
 }

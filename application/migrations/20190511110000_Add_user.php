@@ -41,13 +41,13 @@
  */
 class Migration_Add_user extends CI_Migration {
 
-    public function __construct($config = array()): void {
+    public function __construct($config = array()) {
         parent::__construct($config);
-        $this->lang->load('table/role',$config['language']);
-        $this->lang->load('table/behavior',$config['language']);
+        $this->lang->load('table/role', $this->config->item('language'));
+        $this->lang->load('table/behavior', $this->config->item('language'));
     }
 
-        public function up() {
+    public function up() {
         //table role
         $attributes = array('ENGINE' => 'InnoDB');
         $this->dbforge->add_field('id');
@@ -64,8 +64,8 @@ class Migration_Add_user extends CI_Migration {
         ];
         $this->dbforge->add_field($fields);
         $this->dbforge->create_table('role', TRUE, $attributes);
-        
-                
+
+
         $this->db->insert('role', ['name' => $this->lang->line('Administrator')]);
         $administratos_insert_id = $this->db->insert_id();
 
@@ -139,7 +139,7 @@ class Migration_Add_user extends CI_Migration {
             'first_name' => 'Fulvius',
             'last_name' => 'Titanero Guelfi',
             'email' => 'fulvius@gpmail.com.br',
-            'paswd' => 'h7t846m2',
+            'passwd' => 'h7t846m2',
             'id_role' => $administratos_insert_id
         ]);
 
@@ -168,7 +168,7 @@ class Migration_Add_user extends CI_Migration {
         $this->db->insert('permission', ['id_role' => $administratos_insert_id, 'slug' => 'migrate']);
         $this->db->insert('permission', ['id_role' => $administratos_insert_id, 'slug' => 'migrate/index']);
 
-        $this->dbforge->add_field('id CHAR(36) PRIMARY KEY DEFAULT uuid()');
+        $this->dbforge->add_field('id CHAR(36) PRIMARY KEY');
         $this->dbforge->add_field([
             'id_permission' => array(
                 'type' => 'INT',
@@ -190,6 +190,7 @@ class Migration_Add_user extends CI_Migration {
             ),
         ]);
         $this->dbforge->create_table('element', TRUE, $attributes);
+        $this->db->query('CREATE TRIGGER uuid_before_insert_element BEFORE INSERT ON element FOR EACH ROW SET new.id = uuid();');
 
         $this->dbforge->add_field('id');
         $this->dbforge->add_field([

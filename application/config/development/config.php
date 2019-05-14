@@ -536,5 +536,18 @@ $config['rewrite_short_tags'] = TRUE;
  */
 $config['proxy_ips'] = '';
 
+
+$config['sess_save_path'] = sys_get_temp_dir();
+
 //pagination
 $config['per_page'] = 20;
+
+
+$autoload_function = function ($class) {
+    if (strpos($class, 'CI_') !== 0) {
+        if (file_exists($file = APPPATH . 'core/' . $class . '.php')) {
+            include $file;
+        }
+    }
+};
+spl_autoload_register($autoload_function);

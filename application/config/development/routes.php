@@ -53,5 +53,9 @@ $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
+$route['dashboard'] = 'dashboard/index';
+
 $route['migrate'] = 'migrate/index';
 $route['migrate/index'] = 'migrate/index';
+
+$route['role'] = 'role_maintence/index';

@@ -1,16 +1,11 @@
 <?php
-
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+$this->lang->load('controller/Dashboard', $this->config->item('language'));
 ?>
 <div class="subnavbar">
   <div class="subnavbar-inner">
     <div class="container">
       <ul class="mainnav">
-        <li class="active"><a href="index.html"><i class="icon-dashboard"></i><span>Dashboard</span> </a> </li>
+        <li class="active"><?= anchor('dashboard', '<i class="icon-dashboard"></i><span>'.$this->lang->line('Dashboard').'</span>')?></li>
         <li><a href="reports.html"><i class="icon-list-alt"></i><span>Reports</span> </a> </li>
         <li><a href="guidely.html"><i class="icon-facetime-video"></i><span>App Tour</span> </a></li>
         <li><a href="charts.html"><i class="icon-bar-chart"></i><span>Charts</span> </a> </li>

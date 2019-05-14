@@ -1,11 +1,4 @@
 <?php
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of base
  *
@@ -13,18 +6,33 @@
  */
 class BM_Model extends CI_Model {
 
-    private const DEFAULT_DIRECTION = 'ASC';
-    private const TABLE_NAME = NULL;
-    private const JOIN_TABLES = [];
+    public const DEFAULT_DIRECTION = 'ASC';
+    public const TABLE_NAME = NULL;
+    public const JOIN_TABLES = [];
 
     var $count_all = 0, $insert_id = FALSE, $update_id = FALSE;
 
-    public function __construct(): void {
+    public function __construct() {
         parent::__construct();
         $this->load->database();
-        $this->count_all = $this->db->count_all(static::TABLE_NAME);
-        $this->db->flush_cache();
-        $this->db->from(static::TABLE_NAME);
+        $cl_name = static::class;
+        if (file_exists(APPPATH . 'model/' . $cl_name . '_lang.php')) {
+            $this->lang->load('model/' . $cl_name, $this->config->item('language'));
+        }
+        if (!empty(static::JOIN_TABLES)) {
+            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
+            $this->__add_join();
+            $this->db->select('COUNT(*)');
+            $this->count_all = $this->db->count_all_results();
+            $this->db->flush_cache();
+            var_dump($this->count_all);
+            die;
+        } else {
+            $this->count_all = $this->db->count_all($this->db->dbprefix(static::TABLE_NAME));
+        }
+        $this->db->start_cache();
+        $this->db->from($this->db->dbprefix(static::TABLE_NAME));
+        $this->db->stop_cache();
     }
 
     public function replace(array $where, string $key, array $new_values, array $old_values) {
@@ -35,7 +43,7 @@ class BM_Model extends CI_Model {
         //delete
         $this->db->where($where);
         $this->db->where_in($key, $arr_to_delete);
-        $this->db->delete(static::TABLE_NAME);
+        $this->db->delete($this->db->dbprefix(static::TABLE_NAME));
         $this->db->flush_cache();
 
         //insert
@@ -55,20 +63,20 @@ class BM_Model extends CI_Model {
 
     public function del($where) {
         if (!is_array($where)) {
-            $this->db->where($this->db->primary(static::TABLE_NAME), $where);
-            $result = $this->db->delete(static::TABLE_NAME);
+            $this->db->where($this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
+            $result = $this->db->delete($this->db->dbprefix(static::TABLE_NAME));
         } else {
-            $result = $this->db->delete(static::TABLE_NAME, $where);
+            $result = $this->db->delete($this->db->dbprefix(static::TABLE_NAME), $where);
         }
         log_message('debug', $this->db->last_query());
         return $result;
     }
 
     public function add(array $value) {
-        if (isset($value[$this->db->primary(static::TABLE_NAME)])) {
+        if (isset($value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))])) {
             return FALSE;
         }
-        $result = $this->db->insert(static::TABLE_NAME, $value);
+        $result = $this->db->insert($this->db->dbprefix(static::TABLE_NAME), $value);
         if ($result) {
             $this->insert_id = $this->db->insert_id();
         } else {
@@ -80,12 +88,12 @@ class BM_Model extends CI_Model {
     }
 
     public function upd(array $value) {
-        if (!isset($value[$this->db->primary(static::TABLE_NAME)])) {
+        if (!isset($value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))])) {
             return FALSE;
         }
-        $result = $this->db->update(static::TABLE_NAME, $value);
+        $result = $this->db->update($this->db->dbprefix(static::TABLE_NAME), $value);
         if ($result) {
-            $this->update_id = $value[$this->db->primary(static::TABLE_NAME)];
+            $this->update_id = $value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))];
         } else {
             $this->update_id = FALSE;
         }
@@ -99,7 +107,7 @@ class BM_Model extends CI_Model {
         if (is_array($where)) {
             $this->db->where($where);
         } else {
-            $this->db->where(static::TABLE_NAME . '.' . $this->db->primary(static::TABLE_NAME), $where);
+            $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
             $limit = 1;
         }
         $this->db->stop_cache();
@@ -118,7 +126,7 @@ class BM_Model extends CI_Model {
         $this->__add_group_by($group_by);
         $this->__add_oreder_by($oreder_by);
         ($this->db->cache_on()) ? $query = $this->db->get() : log_message('error', 'db cache_on erro');
-        (!$this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
+        ($this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
         log_message('debug', 'Last query executed: ' . $this->db->last_query());
         $this->db->flush_cache();
         return $result;
@@ -131,7 +139,7 @@ class BM_Model extends CI_Model {
         $this->__add_oreder_by($oreder_by);
         $this->__add_limit($limit, $offset);
         ($this->db->cache_on()) ? $query = $this->db->get() : log_message('error', 'db cache_on erro');
-        (!$this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
+        ($this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
         log_message('debug', 'Last query executed: ' . $this->db->last_query());
         $this->db->flush_cache();
         return $result;
@@ -143,21 +151,22 @@ class BM_Model extends CI_Model {
         $this->db->stop_cache();
     }
 
-    private function __add_join(array $tables = static::JOIN_TABLES): void {
+    private function __add_join(array $tables = NULL): void {
+        $tables = ($tables ?? static::JOIN_TABLES);
         $this->db->start_cache();
         foreach ($tables as $value) {
             if (is_array($value)) {
-                if ($this->db->field_exists($value['on'], static::TABLE_NAME)) {
-                    $value['on'] = static::TABLE_NAME . '.' . $value['on'] . '_' . $value['table'] . ' = ' . $value['table'] . '.' . $value['on'];
+                if ($this->db->field_exists($value['on'], $this->db->dbprefix(static::TABLE_NAME))) {
+                    $value['on'] = $this->db->dbprefix(static::TABLE_NAME) . '.' . $value['on'] . '_' . $this->db->dbprefix($value['table']) . ' = ' . $this->db->dbprefix($value['table']) . '.' . $value['on'];
                 }
-                $this->db->select(self::list_unique_filds($value['table'], TRUE));
-                $this->db->join($value['table'], $value['on'], $value['type']);
+                $this->db->select(self::list_unique_filds($this->db->dbprefix($value['table']), TRUE));
+                $this->db->join($this->db->dbprefix($value['table']), $value['on'], $value['type']);
             } elseif (is_object($value)) {
-                if ($this->db->field_exists($value->on, static::TABLE_NAME)) {
-                    $value->on = static::TABLE_NAME . '.' . $value->on . '_' . $value->table . ' = ' . $value->table . '.' . $value->on;
+                if ($this->db->field_exists($value->on, $this->db->dbprefix(static::TABLE_NAME))) {
+                    $value->on = $this->db->dbprefix(static::TABLE_NAME) . '.' . $value->on . '_' . $this->db->dbprefix($value->table) . ' = ' . $this->db->dbprefix($value->table) . '.' . $value->on;
                 }
-                $this->db->select(self::list_unique_filds($value->table, TRUE));
-                $this->db->join($value->table, $value->on, $value->type);
+                $this->db->select(self::list_unique_filds($this->db->dbprefix($value->table), TRUE));
+                $this->db->join($this->db->dbprefix($value->table), $value->on, $value->type);
             }
         }
         $this->db->stop_cache();
@@ -171,7 +180,7 @@ class BM_Model extends CI_Model {
 
     private function __add_oreder_by($oreder_by = NULL): void {
         $this->db->start_cache();
-        (!empty($oreder_by)) ? $this->db->order_by($oreder_by) : $this->db->order_by($this->db->primary(static::TABLE_NAME), static::DEFAULT_DIRECTION);
+        (!empty($oreder_by)) ? $this->db->order_by($oreder_by) : $this->db->order_by($this->db->primary($this->db->dbprefix(static::TABLE_NAME)), static::DEFAULT_DIRECTION);
         $this->db->stop_cache();
     }
 
@@ -181,28 +190,55 @@ class BM_Model extends CI_Model {
         $this->db->stop_cache();
     }
 
-    public static function get_unique_fild_name(string $fild, string $table_name = static::TABLE_NAME, bool $alias = FALSE): string {
-        if (!empty($table_name)) {
-            if ($this->db->field_exists($fild, $table_name)) {
-                return $table_name . '.' . $fild . (($alias) ? ' as ' . $table_name . '.' . $fild : '');
+    public function get_unique_fild_name(string $fild, string $table_name = NULL, bool $alias = FALSE): string {
+        $actual_table = ($table_name ?? $this->db->dbprefix(static::TABLE_NAME));
+        if (!empty($actual_table)) {
+            if ($this->db->field_exists($fild, $actual_table)) {
+                return $actual_table . '.' . $fild . (($alias) ? ' as ' . $actual_table . '.' . $fild : '');
             }
         }
         return $fild;
     }
 
-    public static function list_unique_filds(string $table_name = static::TABLE_NAME, bool $alias = FALSE): array {
+    public function list_unique_filds(string $table_name = NULL, bool $alias = FALSE): array {
+        $actual_table = ($table_name ?? $this->db->dbprefix(static::TABLE_NAME));
         $result = [];
-        if (!empty($table_name)) {
-            foreach ($this->db->list_fields($table_name) as $fild) {
-                if ($table_name !== static::TABLE_NAME && $this->db->primary($table_name) === $fild) {
+        if (!empty($actual_table)) {
+            foreach ($this->db->list_fields($actual_table) as $fild) {
+                if ($actual_table !== $this->db->dbprefix(static::TABLE_NAME) && $this->db->primary($actual_table) === $fild) {
                     //pass by primary key for join tables.
                     continue;
                 } else {
-                    $result[] = self::get_unique_fild_name($fild, $table_name, $alias);
+                    $result[] = self::get_unique_fild_name($fild, $actual_table, $alias);
                 }
             }
         }
         return $result;
     }
 
+    public function distinct(bool $distinct = TRUE, array $fields = NULL, SSSS$where, int $limit = null, float $offset = 0, $oreder_by = NULL, $group_by = null): array {
+        $result = [];
+        foreach ($fields as $fild) {
+            $result[] = self::get_unique_fild_name($fild);
+        }
+        $this->__prepare_select($result);
+        $this->db->start_cache();
+        $this->db->distinct($distinct);
+        if (is_array($where)) {
+            $this->db->where($where);
+        } else {
+            $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
+            $limit = 1;
+        }
+        $this->db->stop_cache();
+        $this->__add_join();
+        $this->__add_group_by($group_by);
+        $this->__add_oreder_by($oreder_by);
+        $this->__add_limit($limit, $offset);
+        ($this->db->cache_on()) ? $query = $this->db->get() : log_message('error', 'db cache_on erro');
+        ($this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
+        log_message('debug', 'Last query executed: ' . $this->db->last_query());
+        $this->db->flush_cache();
+        return $result;
+    }
 }
