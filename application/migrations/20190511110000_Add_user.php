@@ -45,6 +45,7 @@ class Migration_Add_user extends CI_Migration {
         parent::__construct($config);
         $this->lang->load('table/role', $this->config->item('language'));
         $this->lang->load('table/behavior', $this->config->item('language'));
+        $this->db->cache_delete_all();
     }
 
     public function up() {
@@ -64,7 +65,6 @@ class Migration_Add_user extends CI_Migration {
         ];
         $this->dbforge->add_field($fields);
         $this->dbforge->create_table('role', TRUE, $attributes);
-
 
         $this->db->insert('role', ['name' => $this->lang->line('Administrator')]);
         $administratos_insert_id = $this->db->insert_id();
@@ -223,6 +223,8 @@ class Migration_Add_user extends CI_Migration {
             ),
         ]);
         $this->dbforge->create_table('user_element_behavior', TRUE, $attributes);
+        $this->db->cache_delete_all();
+        return true;
     }
 
     public function down() {
@@ -232,6 +234,9 @@ class Migration_Add_user extends CI_Migration {
         $this->dbforge->drop_table('user');
         $this->dbforge->drop_table('behavior');
         $this->dbforge->drop_table('role');
+//        $this->dbforge->drop_table('migrations');
+        $this->db->cache_delete_all();
+        return true;
     }
 
 }

@@ -20,17 +20,21 @@ class BM_Model extends CI_Model {
         if (file_exists(APPPATH . 'model/' . $cl_name . '_lang.php')) {
             $this->lang->load('model/' . $cl_name, $this->config->item('language'));
         }
-        if (!empty(static::JOIN_TABLES)) {
-            $this->count_all = $this->__count_joined();
-            echo 'count_all: ';
-            var_dump($this->count_all);
-            die;
+        if ($this->db->table_exists($this->db->dbprefix(static::TABLE_NAME))) {
+            if (!empty(static::JOIN_TABLES)) {
+                $this->count_all = $this->__count_joined();
+                echo 'count_all: ' . $this->count_all;
+                var_dump($this->count_all);
+                die;
+            } else {
+                $this->count_all = $this->db->count_all($this->db->dbprefix(static::TABLE_NAME));
+            }
+            $this->db->start_cache();
+            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
+            $this->db->stop_cache();
         } else {
-            $this->count_all = $this->db->count_all($this->db->dbprefix(static::TABLE_NAME));
+            show_error(sprintf($this->lang->line('Table %s not found'), static::TABLE_NAME));
         }
-        $this->db->start_cache();
-        $this->db->from($this->db->dbprefix(static::TABLE_NAME));
-        $this->db->stop_cache();
     }
 
     public function replace(array $where, string $key, array $new_values, array $old_values) {
@@ -243,12 +247,16 @@ class BM_Model extends CI_Model {
     private function __count_joined() {
 //        $this->__prepare_select();
 //        $this->__add_join();
-        $this->db->from($this->db->dbprefix(static::TABLE_NAME));
-        $this->__add_join();
-        $this->db->select('COUNT(*)');
-        $result = $this->db->get();
-        $all = $this->db->count_all_results();
-        $this->db->flush_cache();
+        $all = false;
+        if ($this->db->table_exists($this->db->dbprefix(static::TABLE_NAME))) {
+            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
+            $this->__add_join();
+            $this->db->select('COUNT(*)');
+            $result = $this->db->get();
+            $all = $this->db->count_all_results();
+            $this->db->flush_cache();
+        }
         return $all;
     }
+
 }
