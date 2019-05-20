@@ -60,6 +60,8 @@ if (ENVIRONMENT === 'development') {
 $route['dashboard'] = 'dashboard/index';
 
 $route['role'] = 'role_maintence/index';
+$route['role/modify/(:num)'] = 'role_maintence/modify';
+$route['role/remove/(:num)'] = 'role_maintence/remove';
 
 $route['migrate'] = 'migrate/index';
 $route['migrate/index'] = 'migrate/index';

@@ -1,5 +1,5 @@
 <?php
-
+defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Description of base
  *
@@ -16,6 +16,7 @@ class BM_Model extends CI_Model {
     public function __construct() {
         parent::__construct();
         $this->load->database();
+        $this->db->flush_cache();
         $cl_name = static::class;
         if (file_exists(APPPATH . 'model/' . $cl_name . '_lang.php')) {
             $this->lang->load('model/' . $cl_name, $this->config->item('language'));
@@ -62,15 +63,16 @@ class BM_Model extends CI_Model {
         }
         return TRUE;
     }
-
+    
     public function del($where) {
         if (!is_array($where)) {
-            $this->db->where($this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
+            $this->db->where($this->db->dbprefix(static::TABLE_NAME). '.' .$this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
             $result = $this->db->delete($this->db->dbprefix(static::TABLE_NAME));
         } else {
             $result = $this->db->delete($this->db->dbprefix(static::TABLE_NAME), $where);
         }
         log_message('debug', $this->db->last_query());
+        $this->db->flush_cache();
         return $result;
     }
 
@@ -127,6 +129,32 @@ class BM_Model extends CI_Model {
         $this->__prepare_select($result);
         $this->__add_group_by($group_by);
         $this->__add_oreder_by($oreder_by);
+        ($this->db->cache_on()) ? $query = $this->db->get() : log_message('error', 'db cache_on erro');
+        ($this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
+        log_message('debug', 'Last query executed: ' . $this->db->last_query());
+        $this->db->flush_cache();
+        return $result;
+    }
+
+    public function distinct(bool $distinct = TRUE, array $fields = NULL, $where, int $limit = null, float $offset = 0, $oreder_by = NULL, $group_by = null): array {
+        $result = [];
+        foreach ($fields as $fild) {
+            $result[] = self::get_unique_fild_name($fild);
+        }
+        $this->__prepare_select($result);
+        $this->db->start_cache();
+        $this->db->distinct($distinct);
+        if (is_array($where)) {
+            $this->db->where($where);
+        } else {
+            $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
+            $limit = 1;
+        }
+        $this->db->stop_cache();
+        $this->__add_join();
+        $this->__add_group_by($group_by);
+        $this->__add_oreder_by($oreder_by);
+        $this->__add_limit($limit, $offset);
         ($this->db->cache_on()) ? $query = $this->db->get() : log_message('error', 'db cache_on erro');
         ($this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
         log_message('debug', 'Last query executed: ' . $this->db->last_query());
@@ -215,32 +243,6 @@ class BM_Model extends CI_Model {
                 }
             }
         }
-        return $result;
-    }
-
-    public function distinct(bool $distinct = TRUE, array $fields = NULL, SSSS$where, int $limit = null, float $offset = 0, $oreder_by = NULL, $group_by = null): array {
-        $result = [];
-        foreach ($fields as $fild) {
-            $result[] = self::get_unique_fild_name($fild);
-        }
-        $this->__prepare_select($result);
-        $this->db->start_cache();
-        $this->db->distinct($distinct);
-        if (is_array($where)) {
-            $this->db->where($where);
-        } else {
-            $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
-            $limit = 1;
-        }
-        $this->db->stop_cache();
-        $this->__add_join();
-        $this->__add_group_by($group_by);
-        $this->__add_oreder_by($oreder_by);
-        $this->__add_limit($limit, $offset);
-        ($this->db->cache_on()) ? $query = $this->db->get() : log_message('error', 'db cache_on erro');
-        ($this->db->cache_off()) ? log_message('error', 'db cache_off erro') : $result = ($query->result_array() ?? []);
-        log_message('debug', 'Last query executed: ' . $this->db->last_query());
-        $this->db->flush_cache();
         return $result;
     }
 

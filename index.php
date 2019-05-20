@@ -37,7 +37,6 @@
  * @filesource
  */
 defined('PATH_SEPARATOR') OR ( strpos($_ENV["OS"], "Win")) ? define("PATH_SEPARATOR", ";") : define("PATH_SEPARATOR", ":");
-
 /*
  * ---------------------------------------------------------------
  * APPLICATION ENVIRONMENT

@@ -7,3 +7,4 @@
  */
 
 $lang['System Roles'] = 'System Roles';
+$lang['Edit System Role'] = 'Edit System Role';
