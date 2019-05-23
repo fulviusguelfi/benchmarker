@@ -1,5 +1,5 @@
 <?php
-
+/* teste*/
 class Migrate extends BM_Controler {
 
     public function index() {
