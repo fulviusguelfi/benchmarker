@@ -23,10 +23,8 @@
                         </div>
                         <!-- /widget-content --> 
                     </div>
-
                 </div>
             </div>
-            <!-- /row --> 
         </div>
         <!-- /container --> 
     </div>

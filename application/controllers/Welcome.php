@@ -38,7 +38,7 @@ class Welcome extends BM_Controler {
         } elseif ($hook === 'cria') {
             
         }
-        return $data;
+        return parent::get_data($hook, $data);
     }
     
      public function show_list(array $data, bool $retrn_as_data = FALSE) {

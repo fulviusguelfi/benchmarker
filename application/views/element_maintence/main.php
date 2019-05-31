@@ -27,8 +27,8 @@
                     $this->table->set_caption(($list_caption ?? ''));
                     $this->table->set_heading(['#', 'Name', '']);
                     $this->table->set_empty('&nbsp;');
-                    $this->table_element->add_element_anchor($lista, 'actions', false, 'role/modify', '<i class="btn-icon-only icon-edit"></i>', ['class' => 'btn btn-warning btn-small btn-in-table'], 'role.id');
-                    $this->table_element->add_element_anchor($lista, 'actions', true, 'role/remove', '<i class="btn-icon-only icon-remove"></i>', ['class' => 'btn btn-danger btn-small btn-in-table'], 'role.id');
+                    $this->table_element->add_element_anchor($lista, 'actions', false, 'element/modify', '<i class="btn-icon-only icon-edit"></i>', ['class' => 'btn btn-warning btn-small btn-in-table'], 'element.id');
+                    $this->table_element->add_element_anchor($lista, 'actions', true, 'element/remove', '<i class="btn-icon-only icon-remove"></i>', ['class' => 'btn btn-danger btn-small btn-in-table'], 'element.id');
                     ?>
                     <!-- /widget -->
                     <div class="widget widget-table action-table">
@@ -39,7 +39,7 @@
                                 <?=
                                 form_button('new-role-btn', $this->lang->line('New'), [
                                     'class' => "new-button btn button btn-in-table",
-                                    'onclick' => "javascript:window.location.assign('" . base_url('role/modify') . "')",
+                                    'onclick' => "javascript:window.location.assign('" . base_url('element/modify') . "')",
                                 ])
                                 ?>
                             </div>

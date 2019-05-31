@@ -25,24 +25,24 @@
                         'table_close' => '</table>'
                     ]);
                     $this->table->set_caption(($list_caption ?? ''));
-                    $this->table->set_heading(['#', 'Name', '']);
+                    $this->table->set_heading(['#', 'Slug', 'Role', '']);
                     $this->table->set_empty('&nbsp;');
-                    $this->table_element->add_element_anchor($lista, 'actions', false, 'role/modify', '<i class="btn-icon-only icon-edit"></i>', ['class' => 'btn btn-warning btn-small btn-in-table'], 'role.id');
-                    $this->table_element->add_element_anchor($lista, 'actions', true, 'role/remove', '<i class="btn-icon-only icon-remove"></i>', ['class' => 'btn btn-danger btn-small btn-in-table'], 'role.id');
+                    $this->table_element->add_element_anchor($lista, 'actions', false, 'permission/modify', '<i class="btn-icon-only icon-edit"></i>', ['class' => 'btn btn-warning btn-small btn-in-table'], 'permission_role.id_permission');
+                    $this->table_element->add_element_anchor($lista, 'actions', true, 'permission/remove', '<i class="btn-icon-only icon-remove"></i>', ['class' => 'btn btn-danger btn-small btn-in-table'], 'permission_role.id_permission');
+                    $this->table_element->delete_cols($lista, ['permission_role.id', 'permission_role.id_role']);
+                    $this->table_element->order_cols($lista, ['permission_role.id_permission', 'permission.slug', 'role.name', 'actions']);
+//var_dump($lista);
                     ?>
                     <!-- /widget -->
                     <div class="widget widget-table action-table">
-                        <div class="widget-header"> 
-                            <div class="text-left" >
-                                <i class="icon-th-list"></i>
-                                <h3><?= ($list_title ?? '') ?></h3>
-                                <?=
-                                form_button('new-role-btn', $this->lang->line('New'), [
-                                    'class' => "new-button btn button btn-in-table",
-                                    'onclick' => "javascript:window.location.assign('" . base_url('role/modify') . "')",
-                                ])
-                                ?>
-                            </div>
+                        <div class="widget-header"> <i class="icon-th-list"></i>
+                            <h3><?= ($list_title ?? '') ?></h3>
+                            <?=
+                            form_button('new-role-btn', $this->lang->line('New'), [
+                                'class' => "new-button btn button btn-in-table",
+                                'onclick' => "javascript:window.location.assign('" . base_url('permission/modify') . "')",
+                            ])
+                            ?>
                         </div>
                         <!-- /widget-header -->
                         <div class="widget-content">
@@ -55,7 +55,7 @@
             </div>
             <!-- /row --> 
         </div>
-        <!-- /container --> S
+        <!-- /container --> 
     </div>
     <!-- /main-inner --> 
 </div>

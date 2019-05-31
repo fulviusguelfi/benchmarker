@@ -1,5 +1,7 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 /**
  * Description of base
  *
@@ -24,15 +26,12 @@ class BM_Model extends CI_Model {
         if ($this->db->table_exists($this->db->dbprefix(static::TABLE_NAME))) {
             if (!empty(static::JOIN_TABLES)) {
                 $this->count_all = $this->__count_joined();
-                echo 'count_all: ' . $this->count_all;
-                var_dump($this->count_all);
-                die;
             } else {
                 $this->count_all = $this->db->count_all($this->db->dbprefix(static::TABLE_NAME));
             }
-            $this->db->start_cache();
-            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
-            $this->db->stop_cache();
+//            $this->db->start_cache();
+//            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
+//            $this->db->stop_cache();
         } else {
             show_error(sprintf($this->lang->line('Table %s not found'), static::TABLE_NAME));
         }
@@ -63,10 +62,10 @@ class BM_Model extends CI_Model {
         }
         return TRUE;
     }
-    
+
     public function del($where) {
         if (!is_array($where)) {
-            $this->db->where($this->db->dbprefix(static::TABLE_NAME). '.' .$this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
+            $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
             $result = $this->db->delete($this->db->dbprefix(static::TABLE_NAME));
         } else {
             $result = $this->db->delete($this->db->dbprefix(static::TABLE_NAME), $where);
@@ -95,7 +94,7 @@ class BM_Model extends CI_Model {
         if (!isset($value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))])) {
             return FALSE;
         }
-        $result = $this->db->update($this->db->dbprefix(static::TABLE_NAME), $value);
+        $result = $this->db->replace($this->db->dbprefix(static::TABLE_NAME), $value);
         if ($result) {
             $this->update_id = $value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))];
         } else {
@@ -117,7 +116,7 @@ class BM_Model extends CI_Model {
         $this->db->stop_cache();
         return $this->list($limit, $offset, $oreder_by, $group_by);
     }
-
+    
     public function domain_list(array $fields, $oreder_by = NULL, $group_by = null): array {
         $limit = $this->count_all;
         $offset = 0;
@@ -177,26 +176,35 @@ class BM_Model extends CI_Model {
 
     private function __prepare_select(array $filds = NULL): void {
         $this->db->start_cache();
-        $this->db->select(($filds ?? self::list_unique_filds()));
+        $this->db->select(($filds ?? self::list_unique_filds(null, true)));
+        $this->db->from($this->db->dbprefix(static::TABLE_NAME));
         $this->db->stop_cache();
     }
 
-    private function __add_join(array $tables = NULL): void {
+    private function __add_join(array $tables = NULL, $include_select_fields = true): void {
         $tables = ($tables ?? static::JOIN_TABLES);
         $this->db->start_cache();
         foreach ($tables as $value) {
             if (is_array($value)) {
                 if ($this->db->field_exists($value['on'], $this->db->dbprefix(static::TABLE_NAME))) {
-                    $value['on'] = $this->db->dbprefix(static::TABLE_NAME) . '.' . $value['on'] . '_' . $this->db->dbprefix($value['table']) . ' = ' . $this->db->dbprefix($value['table']) . '.' . $value['on'];
+                    $value['on'] = $this->db->dbprefix(static::TABLE_NAME) . '.' . $value['on'] . '_' . $value['table'] . ' = ' . $this->db->dbprefix($value['table']) . '.' . $value['on'];
+                } elseif ($this->db->field_exists($value['on'], $this->db->dbprefix($value['table']))) {
+                    $value['on'] = $this->db->dbprefix(static::TABLE_NAME) . '.' . str_replace('_' . $this->db->dbprefix(static::TABLE_NAME), '', $value['on']) . ' = ' . $this->db->dbprefix($value['table']) . '.' . $value['on'];
                 }
-                $this->db->select(self::list_unique_filds($this->db->dbprefix($value['table']), TRUE));
-                $this->db->join($this->db->dbprefix($value['table']), $value['on'], $value['type']);
+                if ($include_select_fields) {
+                    $this->db->select(self::list_unique_filds($this->db->dbprefix($value['table']), TRUE));
+                }
+                $this->db->join($this->db->dbprefix($value['table']), $value['on'], ($value['type'] ?? null));
             } elseif (is_object($value)) {
                 if ($this->db->field_exists($value->on, $this->db->dbprefix(static::TABLE_NAME))) {
-                    $value->on = $this->db->dbprefix(static::TABLE_NAME) . '.' . $value->on . '_' . $this->db->dbprefix($value->table) . ' = ' . $this->db->dbprefix($value->table) . '.' . $value->on;
+                    $value->on = $this->db->dbprefix(static::TABLE_NAME) . '.' . $value->on . '_' . $value->table . ' = ' . $this->db->dbprefix($value->table) . '.' . $value->on;
+                } elseif ($this->db->field_exists($value->on, $this->db->dbprefix($value->table))) {
+                    $value->on = $this->db->dbprefix(static::TABLE_NAME) . '.' . str_replace('_' . $this->db->dbprefix(static::TABLE_NAME), '', $value->on) . ' = ' . $this->db->dbprefix($value->table) . '.' . $value->on;
                 }
-                $this->db->select(self::list_unique_filds($this->db->dbprefix($value->table), TRUE));
-                $this->db->join($this->db->dbprefix($value->table), $value->on, $value->type);
+                if ($include_select_fields) {
+                    $this->db->select(self::list_unique_filds($this->db->dbprefix($value->table), TRUE));
+                }
+                $this->db->join($this->db->dbprefix($value->table), $value->on, ($value->type ?? null));
             }
         }
         $this->db->stop_cache();
@@ -210,7 +218,7 @@ class BM_Model extends CI_Model {
 
     private function __add_oreder_by($oreder_by = NULL): void {
         $this->db->start_cache();
-        (!empty($oreder_by)) ? $this->db->order_by($oreder_by) : $this->db->order_by($this->db->primary($this->db->dbprefix(static::TABLE_NAME)), static::DEFAULT_DIRECTION);
+        (!empty($oreder_by)) ? $this->db->order_by($oreder_by) : $this->db->order_by($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), static::DEFAULT_DIRECTION);
         $this->db->stop_cache();
     }
 
@@ -224,7 +232,7 @@ class BM_Model extends CI_Model {
         $actual_table = ($table_name ?? $this->db->dbprefix(static::TABLE_NAME));
         if (!empty($actual_table)) {
             if ($this->db->field_exists($fild, $actual_table)) {
-                return $actual_table . '.' . $fild . (($alias) ? ' as ' . $actual_table . '.' . $fild : '');
+                return $actual_table . '.' . $fild . (($alias) ? ' as "' . $actual_table . '.' . $fild . '"' : '');
             }
         }
         return $fild;
@@ -247,15 +255,10 @@ class BM_Model extends CI_Model {
     }
 
     private function __count_joined() {
-//        $this->__prepare_select();
-//        $this->__add_join();
         $all = false;
         if ($this->db->table_exists($this->db->dbprefix(static::TABLE_NAME))) {
-            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
-            $this->__add_join();
-            $this->db->select('COUNT(*)');
-            $result = $this->db->get();
-            $all = $this->db->count_all_results();
+            $this->__add_join(null, false);
+            $all = $this->db->count_all_results($this->db->dbprefix(static::TABLE_NAME));
             $this->db->flush_cache();
         }
         return $all;

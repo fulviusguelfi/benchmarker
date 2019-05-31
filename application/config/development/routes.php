@@ -60,8 +60,29 @@ if (ENVIRONMENT === 'development') {
 $route['dashboard'] = 'dashboard/index';
 
 $route['role'] = 'role_maintence/index';
+$route['role/modify'] = 'role_maintence/modify';
 $route['role/modify/(:num)'] = 'role_maintence/modify';
 $route['role/remove/(:num)'] = 'role_maintence/remove';
+
+$route['behavior'] = 'behavior_maintence/index';
+$route['behavior/modify'] = 'behavior_maintence/modify';
+$route['behavior/modify/(:num)'] = 'behavior_maintence/modify';
+$route['behavior/remove/(:num)'] = 'behavior_maintence/remove';
+
+$route['user'] = 'user_maintence/index';
+$route['user/modify'] = 'user_maintence/modify';
+$route['user/modify/(:num)'] = 'user_maintence/modify';
+$route['user/remove/(:num)'] = 'user_maintence/remove';
+
+$route['element'] = 'element_maintence/index';
+$route['element/modify'] = 'element_maintence/modify';
+$route['element/modify/(:num)'] = 'element_maintence/modify';
+$route['element/remove/(:num)'] = 'element_maintence/remove';
+
+$route['permission'] = 'permission_maintence/index';
+$route['permission/modify'] = 'permission_maintence/modify';
+$route['permission/modify/(:num)'] = 'permission_maintence/modify';
+$route['permission/remove/(:num)'] = 'permission_maintence/remove';
 
 $route['migrate'] = 'migrate/index';
 $route['migrate/index'] = 'migrate/index';

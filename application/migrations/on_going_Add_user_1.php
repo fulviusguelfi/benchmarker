@@ -129,6 +129,15 @@ class Migration_Add_user extends CI_Migration {
 //                'unsigned' => TRUE,
 //                'auto_increment' => TRUE
             ),
+            'order' => array(
+                'type' => 'INT',
+//                'constraint' => '255',
+//                'null' => TRUE,
+//                'default' => 'King of Town',
+//                'unique' => TRUE,
+//                'unsigned' => TRUE,
+//                'auto_increment' => TRUE
+            ),
         ]);
         $this->dbforge->create_table('sub_hability', TRUE, $attributes);
 

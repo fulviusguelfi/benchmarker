@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-$lang['System Roles'] = 'System Roles';
-$lang['Edit Role'] = 'Edit Role';
-$lang['New Role'] = 'New Role';
+$lang['System Elements']='System Elements';
+$lang['Edit Element']='Edit Element';
+$lang['New Element']='New Element';
 $lang['New']='New';

@@ -8,7 +8,7 @@
 ?>
 <meta charset="utf-8">
 <title><?= $page_title ?></title>
-<?= meta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=n')?>
+<?= meta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1.0')?>
 <?= meta('apple-mobile-web-app-capable', 'yes')?>
 <?= link_tag('css/bootstrap.min.css')?>
 <?= link_tag('css/bootstrap-responsive.min.css')?>

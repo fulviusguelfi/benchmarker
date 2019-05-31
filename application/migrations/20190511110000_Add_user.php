@@ -145,15 +145,6 @@ class Migration_Add_user extends CI_Migration {
 
         $this->dbforge->add_field('id');
         $this->dbforge->add_field([
-            'id_role' => array(
-                'type' => 'INT',
-//                'constraint' => '9',
-//                'null' => TRUE,
-//                'default' => 'King of Town',
-//                'unique' => TRUE,
-//                'unsigned' => TRUE,
-//                'auto_increment' => TRUE
-            ),
             'slug' => array(
                 'type' => 'VARCHAR',
                 'constraint' => '255',
@@ -165,8 +156,39 @@ class Migration_Add_user extends CI_Migration {
             ),
         ]);
         $this->dbforge->create_table('permission', TRUE, $attributes);
-        $this->db->insert('permission', ['id_role' => $administratos_insert_id, 'slug' => 'migrate']);
-        $this->db->insert('permission', ['id_role' => $administratos_insert_id, 'slug' => 'migrate/index']);
+        $this->db->insert('permission', ['slug' => 'migrate']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'migrate/index']);
+        $permission_insert_ids[] = $this->db->insert_id();
+
+        $this->dbforge->add_field('id');
+        $this->dbforge->add_field([
+            'id_role' => array(
+                'type' => 'INT',
+//                'constraint' => '9',
+//                'null' => TRUE,
+//                'default' => 'King of Town',
+//                'unique' => TRUE,
+//                'unsigned' => TRUE,
+//                'auto_increment' => TRUE
+            ),
+            'id_permission' => array(
+                'type' => 'INT',
+//                'constraint' => '255',
+//                'null' => TRUE,
+//                'default' => 'King of Town',
+//                'unique' => TRUE,
+//                'unsigned' => TRUE,
+//                'auto_increment' => TRUE
+            ),
+        ]);
+        $this->dbforge->create_table('permission_role', TRUE, $attributes);
+        foreach ($permission_insert_ids as $permission_insert_id) {
+            $this->db->insert('permission_role', [
+                'id_role' => $administratos_insert_id,
+                'id_permission' => $permission_insert_id,
+            ]);
+        }
 
         $this->dbforge->add_field('id CHAR(36) PRIMARY KEY');
         $this->dbforge->add_field([

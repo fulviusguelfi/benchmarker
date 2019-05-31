@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => 'h7t846m2',
-	'database' => 'benchmarker',
+	'hostname' => 'localhost',          
+	'username' => 'root',               //bench
+	'password' => 'h7t846m2',           //cfg2019
+	'database' => 'benchmarker',        //coach746_benchmarker
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

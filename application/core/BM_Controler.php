@@ -25,7 +25,7 @@ class BM_Controler extends CI_Controller {
         'default/end_html_body',
     ];
     var $data = [];
-    var $group_by, $order_by, $limit, $off_set;
+    var $group_by, $order_by, $limit, $off_set, $model_name;
 
     public function __construct() {
         parent::__construct();
@@ -35,6 +35,7 @@ class BM_Controler extends CI_Controller {
 
 //OVERIDE
     public function set_model($model) {
+        $this->model_name = $model;
         $this->load->model($model, 'model');
     }
 
@@ -43,15 +44,37 @@ class BM_Controler extends CI_Controller {
     }
 
     public function show_list(array $data) {
+        //apaga cache (index e modify)
+        if ((!empty($data['altera']) && $data['altera'] == true) || (!empty($data['cria']) && $data['cria'] == true) || (!empty($data['remove']) && $data['remove'] == true)) {
+            $this->cache_delete_db();
+            if ($this->session->has_userdata('last_list')) {
+                redirect($this->session->userdata('last_list'));
+            }
+        }
+        if (ENVIRONMENT === 'development') {
+            var_dump($data);
+        }
+        $this->session->set_userdata('last_list', $this->uri->uri_string());
         foreach ($this->view_sequece as $value) {
             $this->load->view($value, $data);
         }
     }
 
     public function show_form(array $data) {
+        if (ENVIRONMENT === 'development') {
+            var_dump($data);
+        }
         foreach ($this->view_sequece as $value) {
             $this->load->view($value, $data);
         }
+    }
+
+    protected function cache_delete_db() {
+        
+    }
+    
+    protected function form_common() {
+        
     }
 
 //OVERIDE
@@ -70,13 +93,13 @@ class BM_Controler extends CI_Controller {
                 $this->data = array_merge($this->data, ['lista' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
             }
         } else {
-            //busca
+            //lista com busca
             $this->data = array_merge($this->input->post(null, TRUE), $this->data);
-            $this->data = $this->get_data('busca', $this->data);
+            $this->data = $this->get_data('lista', $this->data);
             if (isset($this->model)) {
-                $this->data = array_merge($this->data, ['busca' => $this->model->search($this->data, $this->limit, $this->off_set, $this->order_by, $this->group_by)]);
+                $this->data = array_merge($this->data, ['lista' => $this->model->search($this->data, $this->limit, $this->off_set, $this->order_by, $this->group_by)]);
             } else {
-                $this->data = array_merge($this->data, ['busca' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
+                $this->data = array_merge($this->data, ['lista' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
             }
         }
         $this->show_list($this->data);
@@ -84,47 +107,38 @@ class BM_Controler extends CI_Controller {
 
     public function modify() {
         if (empty($this->input->post())) {
+            $this->data = array_merge($this->data, ['form_action' => $this->uri->uri_string(),]);
             if ($this->uri->segment(3, false)) {
-                $this->limit = 1;
-                $this->off_set = 0;
-                $this->order_by = NULL;
-                $this->group_by = NULL;
                 //seleciona
-//                $this->data = array_merge(['hidden_filds' => ['id' => $this->uri->segment(3)]], $this->data);
+                $this->form_common();
                 $this->data = $this->get_data('seleciona', $this->data);
-                if (isset($this->model)) {
-                    $this->data = array_merge($this->data, ['seleciona' => $this->model->search($this->uri->segment(3), $this->limit, $this->off_set, $this->order_by, $this->group_by)]);
-                } else {
-                    $this->data = array_merge($this->data, ['seleciona' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
-                }
-                //show form
-                $this->show_form($this->data);
+                $this->show_form(array_merge($this->data, $this->bm_form_builder->build_form()));
             } else {
-                
+                //novo init
+                $this->form_common();
+                $this->data = $this->get_data('novo', $this->data);
+                $this->show_form(array_merge($this->data, $this->bm_form_builder->build_form()));
             }
         } else {
             if (($this->input->post('id', TRUE) ?? false)) {
                 $this->data = array_merge($this->input->post(null, TRUE), $this->data);
                 //altera
                 $this->data = $this->get_data('altera', $this->data);
-//                $this->model->upd
                 if (isset($this->model)) {
-                    $this->data = array_merge($this->data, ['altera' => $this->model->upd()]);
+                    $this->data = array_merge($this->data, ['altera' => $this->model->upd($this->data)]);
                 } else {
-                    $this->data = array_merge($this->data, ['altera' => '' /* $this->lang->line('') */]);
+                    $this->data = array_merge($this->data, ['altera' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
                 }
             } else {
                 $this->data = array_merge($this->input->post(null, TRUE), $this->data);
                 //cria
                 $this->data = $this->get_data('cria', $this->data);
-//                $this->model->add
                 if (isset($this->model)) {
-                    $this->data = array_merge($this->data, ['cria' => $this->model->upd()]);
+                    $this->data = array_merge($this->data, ['cria' => $this->model->add($this->data)]);
                 } else {
-                    $this->data = array_merge($this->data, ['cria' => '' /* $this->lang->line('') */]);
+                    $this->data = array_merge($this->data, ['cria' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
                 }
             }
-            //apaga cache (index e modify)
             $this->show_list($this->data);
         }
     }
@@ -135,10 +149,10 @@ class BM_Controler extends CI_Controller {
                 //remove
                 $this->data = $this->get_data('remove', $this->data);
                 if (isset($this->model)) {
-                    $this->model->del($this->uri->segment(3));
+                    $this->data = array_merge($this->data, ['remove' => $this->model->del($this->uri->segment(3))]);
                 } else {
+                    $this->data = array_merge($this->data, ['remove' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
                     log_message('error', $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method'));
-                    show_error($this->lang->line('Model class was not seted!'));
                 }
             }
         } else {
@@ -146,12 +160,13 @@ class BM_Controler extends CI_Controller {
             //remove
             $this->data = $this->get_data('remove', $this->data);
             if (isset($this->model)) {
-                $this->model->del($this->data);
+                $this->data = array_merge($this->data, ['remove' => $this->model->del($this->data)]);
             } else {
+                $this->data = array_merge($this->data, ['remove' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
                 log_message('error', $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method'));
-                show_error($this->lang->line('Model class was not seted!'));
             }
         }
+        $this->show_list($this->data);
     }
 
 }
