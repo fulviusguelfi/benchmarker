@@ -28,7 +28,7 @@ class Welcome extends BM_Controler {
     protected function get_data($hook, $data): array {
         $data = array_merge($data, ['page_title' => $this->lang->line('Welcome')]);
         if ($hook === 'lista') {
-            print_r(apache_get_modules());
+            
         } elseif ($hook === 'busca') {
             
         } elseif ($hook === 'seleciona') {
@@ -40,9 +40,10 @@ class Welcome extends BM_Controler {
         }
         return parent::get_data($hook, $data);
     }
-    
-     public function show_list(array $data, bool $retrn_as_data = FALSE) {
-         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'welcome/main']);
-         parent::show_list($data, $retrn_as_data);
-     }
+
+    public function show_list(array $data, bool $retrn_as_data = FALSE) {
+        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'welcome/main']);
+        parent::show_list($data, $retrn_as_data);
+    }
+
 }
