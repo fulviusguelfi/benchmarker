@@ -331,10 +331,8 @@ class CI_Loader {
 			{
 				if ( ! file_exists($mod_path.'models/'.$path.$model.'.php'))
 				{
-                                    echo $mod_path.'models/'.$path.$model.'.php';
 					continue;
 				}
-                                    echo $mod_path.'models/'.$path.$model.'.php';
 
 				require_once($mod_path.'models/'.$path.$model.'.php');
 				if ( ! class_exists($model, FALSE))
