@@ -28,7 +28,7 @@ class Welcome extends BM_Controler {
     protected function get_data($hook, $data): array {
         $data = array_merge($data, ['page_title' => $this->lang->line('Welcome')]);
         if ($hook === 'lista') {
-            
+            print_r(apache_get_modules());
         } elseif ($hook === 'busca') {
             
         } elseif ($hook === 'seleciona') {
