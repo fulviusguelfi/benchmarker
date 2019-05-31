@@ -53,9 +53,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-if (ENVIRONMENT === 'development') {
-    $route['teste'] = 'teste/index'; //rota para controller de desenvolvimento
-}
 
 $route['dashboard'] = 'dashboard/index';
 
