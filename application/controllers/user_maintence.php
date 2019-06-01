@@ -20,12 +20,17 @@ class user_maintence extends BM_Controler {
 
     protected function form_common() {
         $this->bm_form_builder->assign_vars('user', $this->uri->segment(3, null));
-        $this->bm_form_builder->exclude_form_values(['user.passwd']);
-        $this->bm_form_builder->set_extra_for('user.first_name', ['placeholder' => '', 'class' => 'form-control ']);
-        $this->bm_form_builder->set_extra_for('user.last_name', ['placeholder' => '', 'class' => 'form-control']);
-        $this->bm_form_builder->set_extra_for('user.email', ['placeholder' => '', 'class' => 'form-control']);
-        $this->bm_form_builder->set_extra_for('user.id_role', ['class' => 'form-control']);
-        $this->bm_form_builder->set_options_for('user.id_role', $this->role->domain_list(['id','name']), false, 'id', 'name');
+        $this->bm_form_builder->exclude_form_values(['passwd']);
+        $this->bm_form_builder->set_extra_for('first_name', ['placeholder' => '', 'class' => 'form-control ']);
+        $this->bm_form_builder->set_extra_for('last_name', ['placeholder' => '', 'class' => 'form-control']);
+        $this->bm_form_builder->set_extra_for('email', ['placeholder' => '', 'class' => 'form-control']);
+        $this->bm_form_builder->set_extra_for('id_role', ['class' => 'form-control']);
+        $this->bm_form_builder->set_options_for('id_role', $this->role->domain_list(['id', 'name']), false, 'id', 'name');
+    }
+
+    protected function cache_delete_db() {
+        $this->db->cache_delete('user', 'index');
+        $this->db->cache_delete('user', 'modify');
     }
 
     protected function get_data($hook, $data): array {
@@ -33,13 +38,13 @@ class user_maintence extends BM_Controler {
             $this->set_model('user');
             $data = array_merge($data, ['list_title' => $this->lang->line('System Users')]);
         } elseif ($hook === 'seleciona') {
-            $this->bm_form_builder->hide_form_values(['user.id']);
+            $this->bm_form_builder->hide_form_values(['id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Edit User'),
                 'form_attributes' => ['class' => 'form-inline'],
             ]);
         } elseif ($hook === 'novo') {
-            $this->bm_form_builder->exclude_form_values(['user.id']);
+            $this->bm_form_builder->exclude_form_values(['id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('New User'),
                 'form_attributes' => ['class' => 'form-inline'],

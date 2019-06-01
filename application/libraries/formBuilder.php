@@ -129,7 +129,7 @@ class formBuilder {
 //             print_r($val);
 //             var_dump($val);
             // First, handle the field type
-            $val->name = $tablename . '.' . $val->name;
+            $val->name = $val->name;
             switch ($val->type) {
                 case "varchar":
                     $returnArray[$val->name]["type"] = "text";
@@ -169,13 +169,15 @@ class formBuilder {
         $CI->db->from($CI->db->dbprefix($tablename));
         $CI->db->where($CI->db->dbprefix($tablename) . '.' . $CI->db->primary($CI->db->dbprefix($tablename)), $id);
         $query = $CI->db->get();
+        
 
         $outputArray = array();
         if ($query->num_rows() == "1") {
             foreach ($query->row_array() as $ky => $val) {
-                $outputArray[$CI->db->dbprefix($tablename) . '.' . $ky] = $val;
+                $outputArray[$ky] = $val;
             }
         }
+
         if (!empty($outputArray)) {
             return $outputArray;
         } else {

@@ -1143,6 +1143,22 @@ table.fc-border-separate {
 .main{
     min-height: 500px
 }
+
+input, textarea, select, .uneditable-input {
+    display: inline-block;
+    width: available;
+    height: auto;
+    padding: 6px;
+    margin-bottom: 12px !important;
+    font-size: medium;
+    line-height: normal;
+    color: #555555;
+    border: thin solid #cfcfcf;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
 /*custom CSS BM Project*/
 
 /*------------------------------------------------------------------

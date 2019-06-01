@@ -94,9 +94,11 @@ class BM_Model extends CI_Model {
         if (!isset($value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))])) {
             return FALSE;
         }
-        $result = $this->db->replace($this->db->dbprefix(static::TABLE_NAME), $value);
+        $the_id = $value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))];
+        unset($value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))]);
+        $result = $this->db->update(static::TABLE_NAME, $value, $this->db->primary($this->db->dbprefix(static::TABLE_NAME))." = ".$the_id);
         if ($result) {
-            $this->update_id = $value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))];
+            $this->update_id = $the_id;
         } else {
             $this->update_id = FALSE;
         }

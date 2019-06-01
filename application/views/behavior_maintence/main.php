@@ -27,7 +27,6 @@
                     $this->table->set_caption(($list_caption ?? ''));
                     $this->table->set_heading(['#', 'Name', '']);
                     $this->table->set_empty('&nbsp;');
-                    $this->table_element->add_element_anchor($lista, 'behavior.name', false, 'behavior/modify', null, [], 'behavior.id');
                     $this->table_element->add_element_anchor($lista, 'actions', false, 'behavior/modify', '<i class="btn-icon-only icon-edit"></i>', ['class' => 'btn btn-warning btn-small btn-in-table'], 'behavior.id');
                     $this->table_element->add_element_anchor($lista, 'actions', true, 'behavior/remove', '<i class="btn-icon-only icon-remove"></i>', ['class' => 'btn btn-danger btn-small btn-in-table'], 'behavior.id');
 //var_dump($lista);

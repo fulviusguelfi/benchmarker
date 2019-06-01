@@ -19,7 +19,7 @@ class role_maintence extends BM_Controler {
 
     protected function form_common() {
         $this->bm_form_builder->assign_vars('role', $this->uri->segment(3, null));
-        $this->bm_form_builder->set_extra_for('role.name', ['placeholder' => '', 'class' => 'form-control']);
+        $this->bm_form_builder->set_extra_for('name', ['placeholder' => '', 'class' => 'form-control']);
     }
 
     protected function get_data($hook, $data): array {
@@ -27,13 +27,13 @@ class role_maintence extends BM_Controler {
             $this->set_model('role');
             $data = array_merge($data, ['list_title' => $this->lang->line('System Roles')]);
         } elseif ($hook === 'seleciona') {
-            $this->bm_form_builder->hide_form_values(['role.id']);
+            $this->bm_form_builder->hide_form_values(['id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Edit Role'),
                 'form_attributes' => ['class' => 'form-inline'],
             ]);
         } elseif ($hook === 'novo') {
-            $this->bm_form_builder->exclude_form_values(['role.id']);
+            $this->bm_form_builder->exclude_form_values(['id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('New Role'),
                 'form_attributes' => ['class' => 'form-inline'],

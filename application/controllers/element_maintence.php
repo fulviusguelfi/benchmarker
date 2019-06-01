@@ -20,9 +20,9 @@ class element_maintence extends BM_Controler {
 
     protected function form_common() {
         $this->bm_form_builder->assign_vars('element', $this->uri->segment(3, null));
-        $this->bm_form_builder->set_options_for('element.id_permission', $this->permission->domain_list(['id','slug']), false, 'id', 'slug');
-        $this->bm_form_builder->set_extra_for('element.id_permission', ['class' => 'form-control']);
-        $this->bm_form_builder->set_extra_for('element.description', ['placeholder' => '', 'class' => 'form-control']);
+        $this->bm_form_builder->set_options_for('id_permission', $this->permission->domain_list(['id','slug']), false, 'id', 'slug');
+        $this->bm_form_builder->set_extra_for('id_permission', ['class' => 'form-control']);
+        $this->bm_form_builder->set_extra_for('description', ['placeholder' => '', 'class' => 'form-control']);
     }
 
     protected function get_data($hook, $data): array {
@@ -30,13 +30,13 @@ class element_maintence extends BM_Controler {
             $this->set_model('element');
             $data = array_merge($data, ['list_title' => $this->lang->line('System Elements')]);
         } elseif ($hook === 'seleciona') {
-            $this->bm_form_builder->hide_form_values(['element.id']);
+            $this->bm_form_builder->hide_form_values(['id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Edit Element'),
                 'form_attributes' => ['class' => 'form-inline'],
             ]);
         } elseif ($hook === 'novo') {
-            $this->bm_form_builder->exclude_form_values(['element.id']);
+            $this->bm_form_builder->exclude_form_values(['id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('New Element'),
                 'form_attributes' => ['class' => 'form-inline'],
