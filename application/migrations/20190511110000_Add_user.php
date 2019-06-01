@@ -55,7 +55,7 @@ class Migration_Add_user extends CI_Migration {
         $fields = [
             'name' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '25',
 //                'null' => TRUE,
 //                'default' => 'King of Town',
 //                'unique' => TRUE,
@@ -68,12 +68,13 @@ class Migration_Add_user extends CI_Migration {
 
         $this->db->insert('role', ['name' => $this->lang->line('Administrator')]);
         $administratos_insert_id = $this->db->insert_id();
+        $this->db->insert('role', ['name' => $this->lang->line('Guest')]);
 
         $this->dbforge->add_field('id');
         $this->dbforge->add_field([
             'name' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '25',
 //                'null' => TRUE,
 //                'default' => 'King of Town',
 //                'unique' => TRUE,
@@ -90,8 +91,8 @@ class Migration_Add_user extends CI_Migration {
         $this->dbforge->add_field([
             'first_name' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '255',
-                'null' => TRUE,
+                'constraint' => '50',
+//                'null' => TRUE,
 //                'default' => 'King of Town',
 //                'unique' => TRUE,
 //                'unsigned' => TRUE,
@@ -99,8 +100,8 @@ class Migration_Add_user extends CI_Migration {
             ),
             'last_name' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '255',
-                'null' => TRUE,
+                'constraint' => '100',
+//                'null' => TRUE,
 //                'default' => 'King of Town',
 //                'unique' => TRUE,
 //                'unsigned' => TRUE,
@@ -108,7 +109,7 @@ class Migration_Add_user extends CI_Migration {
             ),
             'email' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '100',
 //                'null' => TRUE,
 //                'default' => 'King of Town',
 //                'unique' => TRUE,
@@ -118,8 +119,8 @@ class Migration_Add_user extends CI_Migration {
             'passwd' => array(
                 'type' => 'VARCHAR',
                 'constraint' => '255',
-//                'null' => TRUE,
-//                'default' => 'King of Town',
+                'null' => TRUE,
+                'default' => null,
 //                'unique' => TRUE,
 //                'unsigned' => TRUE,
 //                'auto_increment' => TRUE
@@ -147,7 +148,7 @@ class Migration_Add_user extends CI_Migration {
         $this->dbforge->add_field([
             'slug' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '50',
 //                'null' => TRUE,
 //                'default' => 'King of Town',
 //                'unique' => TRUE,
@@ -159,6 +160,26 @@ class Migration_Add_user extends CI_Migration {
         $this->db->insert('permission', ['slug' => 'migrate']);
         $permission_insert_ids[] = $this->db->insert_id();
         $this->db->insert('permission', ['slug' => 'migrate/index']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'role/index']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'role/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'user/index']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'user/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'element/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'element/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'element/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'element/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'permission/modify']);
+        $permission_insert_ids[] = $this->db->insert_id();
+        $this->db->insert('permission', ['slug' => 'permission/modify']);
         $permission_insert_ids[] = $this->db->insert_id();
 
         $this->dbforge->add_field('id');
@@ -192,6 +213,15 @@ class Migration_Add_user extends CI_Migration {
 
         $this->dbforge->add_field('id CHAR(36) PRIMARY KEY');
         $this->dbforge->add_field([
+            'name' => array(
+                'type' => 'VARCHAR',
+                'constraint' => '50',
+//                'null' => TRUE,
+//                'default' => 'King of Town',
+//                'unique' => TRUE,
+//                'unsigned' => TRUE,
+//                'auto_increment' => TRUE
+            ),
             'id_permission' => array(
                 'type' => 'INT',
 //                'constraint' => '9',
