@@ -282,6 +282,7 @@ class Migration_Add_user extends CI_Migration {
     public function down() {
         $this->dbforge->drop_table('user_element_behavior');
         $this->dbforge->drop_table('element');
+        $this->dbforge->drop_table('permission_role');
         $this->dbforge->drop_table('permission');
         $this->dbforge->drop_table('user');
         $this->dbforge->drop_table('behavior');
