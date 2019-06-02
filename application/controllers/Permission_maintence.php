@@ -17,16 +17,16 @@ class Permission_maintence extends BM_Controler {
         parent::__construct();
         $this->load->model('role');
         $this->load->model('permission');
+        $this->load->model('permission_role');
         echo 'aqui';
         die;
-        $this->load->model('permissionrole');
     }
 
     protected function form_common() {
         $form_structure = $this->bm_form_builder->get_form_structure('permission') + $this->bm_form_builder->get_form_structure('permission_role');
         $form_values = $this->bm_form_builder->get_form_values('permission', $this->uri->segment(3, null));
 
-        $permission_roles = $this->permissionrole->search(['permission.id' => $form_values['permission.id']]);
+        $permission_roles = $thi->permission_role->search(['permission.id' => $form_values['permission.id']]);
         $form_values['permission_role.id_role'] = array_column($permission_roles, 'permission_role.id_role', 'permission_role.id');
         var_dump($form_values);
         die;
