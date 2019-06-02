@@ -25,10 +25,13 @@
                         'table_close' => '</table>'
                     ]);
                     $this->table->set_caption(($list_caption ?? ''));
-                    $this->table->set_heading(['#', 'Name', '']);
+                    $this->table->set_heading(['#', 'Name', 'Description', 'Slug', '']);
                     $this->table->set_empty('&nbsp;');
                     $this->table_element->add_element_anchor($lista, 'actions', false, 'element/modify', '<i class="btn-icon-only icon-edit"></i>', ['class' => 'btn btn-warning btn-small btn-in-table'], 'element.id');
                     $this->table_element->add_element_anchor($lista, 'actions', true, 'element/remove', '<i class="btn-icon-only icon-remove"></i>', ['class' => 'btn btn-danger btn-small btn-in-table'], 'element.id');
+                    $this->table_element->delete_cols($lista, ['element.id_permission']);
+//                    var_dump($lista);
+//                    die;
                     ?>
                     <!-- /widget -->
                     <div class="widget widget-table action-table">

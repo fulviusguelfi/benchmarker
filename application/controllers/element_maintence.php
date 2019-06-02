@@ -24,6 +24,11 @@ class element_maintence extends BM_Controler {
         $this->bm_form_builder->set_extra_for('id_permission', ['class' => 'form-control']);
         $this->bm_form_builder->set_extra_for('description', ['placeholder' => '', 'class' => 'form-control']);
     }
+    
+    protected function cache_delete_db() {
+        $this->db->cache_delete('element', 'index');
+        $this->db->cache_delete('element', 'modify');
+    }
 
     protected function get_data($hook, $data): array {
         if ($hook === 'lista') {

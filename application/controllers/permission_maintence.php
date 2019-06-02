@@ -23,7 +23,7 @@ class permission_maintence extends BM_Controler {
     protected function form_common() {
         $form_structure = $this->bm_form_builder->get_form_structure('permission') + $this->bm_form_builder->get_form_structure('permission_role');
         $form_values = $this->bm_form_builder->get_form_values('permission', $this->uri->segment(3, null));
-        
+
         $permission_roles = $this->permission_role->search(['permission.id' => $form_values['permission.id']]);
         $form_values['permission_role.id_role'] = array_column($permission_roles, 'permission_role.id_role', 'permission_role.id');
         var_dump($form_values);
@@ -37,11 +37,11 @@ class permission_maintence extends BM_Controler {
         $this->bm_form_builder->set_options_for('id_role', $this->role->domain_list(['id', 'name']), true, 'id', 'name');
     }
 
-     protected function cache_delete_db() {
+    protected function cache_delete_db() {
         $this->db->cache_delete('permission', 'index');
         $this->db->cache_delete('permission', 'modify');
     }
-    
+
     protected function get_data($hook, $data): array {
         if ($hook === 'lista') {
             $this->set_model('permission_role');

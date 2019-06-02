@@ -52,7 +52,7 @@ class BM_Controler extends CI_Controller {
             }
         }
         if (ENVIRONMENT === 'development') {
-            var_dump($data);
+//            var_dump($data);
         }
         $this->session->set_userdata('last_list', $this->uri->uri_string());
         foreach ($this->view_sequece as $value) {
