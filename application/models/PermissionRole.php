@@ -4,7 +4,7 @@
  *
  * @author fulvi
  */
-class Permission_role extends BM_Model{
+class PermissionRole extends BM_Model{
     public const TABLE_NAME = 'permission_role';
     public const JOIN_TABLES = [
         ['table' => permission::TABLE_NAME, 'on' => 'id'],

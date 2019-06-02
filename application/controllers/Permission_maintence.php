@@ -47,13 +47,13 @@ class Permission_maintence extends BM_Controler {
             $this->set_model('permission_role');
             $data = array_merge($data, ['list_title' => $this->lang->line('System Permissons & Roles')]);
         } elseif ($hook === 'seleciona') {
-            $this->bm_form_builder->hide_form_values(['permission.id', 'permission_role.id']);
+            $this->bm_form_builder->hide_form_values(['id', 'permission_role.id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Edit Permission'),
                 'form_attributes' => ['class' => 'form-inline'],
             ]);
         } elseif ($hook === 'novo') {
-            $this->bm_form_builder->exclude_form_values(['permission.id', 'permission_role.id']);
+            $this->bm_form_builder->exclude_form_values(['id', 'permission_role.id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('New PermissionS'),
                 'form_attributes' => ['class' => 'form-inline'],
