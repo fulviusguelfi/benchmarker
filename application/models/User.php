@@ -11,7 +11,7 @@
  *
  * @author fulvi
  */
-class user extends BM_Model{
+class User extends BM_Model{
     public const TABLE_NAME = 'user';
     public const JOIN_TABLES = [
         ['table' => role::TABLE_NAME, 'on' => 'id']

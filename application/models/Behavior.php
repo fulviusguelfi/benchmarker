@@ -11,7 +11,7 @@
  *
  * @author fulvi
  */
-class behavior extends BM_Model{
+class Behavior extends BM_Model{
     public const TABLE_NAME = 'behavior';
     public const JOIN_TABLES = [];
 }
