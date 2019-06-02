@@ -14,10 +14,10 @@
 class Permission_maintence extends BM_Controler {
 
     public function __construct() {
-        echo 'aqui';
-        die;
         parent::__construct();
         $this->load->model('role');
+        echo 'aqui';
+        die;
         $this->load->model('permission');
         $this->load->model('permissionrole');
     }
