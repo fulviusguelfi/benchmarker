@@ -11,7 +11,7 @@
  *
  * @author fulvi
  */
-class user_maintence extends BM_Controler {
+class User_maintence extends BM_Controler {
 
     public function __construct() {
         parent::__construct();

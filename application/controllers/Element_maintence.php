@@ -11,7 +11,7 @@
  *
  * @author fulvi
  */
-class element_maintence extends BM_Controler {
+class Element_maintence extends BM_Controler {
 
     public function __construct() {
         parent::__construct();

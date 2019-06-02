@@ -11,7 +11,7 @@
  *
  * @author fulvi
  */
-class behavior_maintence extends BM_Controler {
+class Behavior_maintence extends BM_Controler {
 
     public function __construct() {
         parent::__construct();
