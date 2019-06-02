@@ -18,8 +18,6 @@ class Permission_maintence extends BM_Controler {
         $this->load->model('role');
         $this->load->model('permission');
         $this->load->model('permission_role');
-        echo 'aqui';
-        die;
     }
 
     protected function form_common() {
@@ -46,7 +44,7 @@ class Permission_maintence extends BM_Controler {
 
     protected function get_data($hook, $data): array {
         if ($hook === 'lista') {
-            $this->set_model('permissionrole');
+            $this->set_model('permission_role');
             $data = array_merge($data, ['list_title' => $this->lang->line('System Permissons & Roles')]);
         } elseif ($hook === 'seleciona') {
             $this->bm_form_builder->hide_form_values(['id', 'permission_role.id']);
