@@ -21,17 +21,20 @@ class Permission_maintence extends BM_Controler {
     }
 
     protected function form_common() {
-        $form_structure = $this->bm_form_builder->get_form_structure('permission') +
-                ['permission_role' => $this->bm_form_builder->get_form_structure('permission_role')];
+        $form_structure = $this->bm_form_builder->get_form_structure('permission') + $this->bm_form_builder->get_form_structure('permission_role');
         $form_values = $this->bm_form_builder->get_form_values('permission', $this->uri->segment(3, null));
-        $form_values += ['permission_role' => $this->bm_form_builder->get_form_values('permission_role', ['id_permission' => $form_values['id']])];
 
-        $this->bm_form_builder->assign_vars($form_structure,  $form_values);
-        $this->bm_form_builder->exclude_form_values([['permission_role' => 'id_permission']]);
+        $permission_roles = $thi->permission_role->search(['permission.id' => $form_values['permission.id']]);
+        $form_values['permission_role.id_role'] = array_column($permission_roles, 'permission_role.id_role', 'permission_role.id');
+        var_dump($form_values);
+        die;
+
+
+        $this->bm_form_builder->assign_vars($form_structure, $form_values);
+        $this->bm_form_builder->exclude_form_values(['id_permission']);
         $this->bm_form_builder->set_extra_for('slug', ['placeholder' => '', 'class' => 'form-control']);
-        $this->bm_form_builder->set_extra_for(['permission_role' => 'id_role'], ['class' => 'form-control']);
-        $this->bm_form_builder->set_options_for(['permission_role' => 'id_role'], $this->role->domain_list(['id', 'name']), false, 'id', 'name');
-        
+        $this->bm_form_builder->set_extra_for('id_role', ['class' => 'form-control']);
+        $this->bm_form_builder->set_options_for('id_role', $this->role->domain_list(['id', 'name']), true, 'id', 'name');
     }
 
     protected function cache_delete_db() {
@@ -44,17 +47,13 @@ class Permission_maintence extends BM_Controler {
             $this->set_model('permission_role');
             $data = array_merge($data, ['list_title' => $this->lang->line('System Permissons & Roles')]);
         } elseif ($hook === 'seleciona') {
-            $this->bm_form_builder->hide_form_values(['id',['permission_role' => 'id']]);
+            $this->bm_form_builder->hide_form_values(['id', 'permission_role.id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Edit Permission'),
                 'form_attributes' => ['class' => 'form-inline'],
             ]);
-            echo '<pre>';
-            print_r($this->bm_form_builder);
-            echo '</pre>';
-        die;
         } elseif ($hook === 'novo') {
-            $this->bm_form_builder->exclude_form_values(['id']);
+            $this->bm_form_builder->exclude_form_values(['id', 'permission_role.id']);
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('New PermissionS'),
                 'form_attributes' => ['class' => 'form-inline'],

@@ -25,7 +25,7 @@ class BM_Controler extends CI_Controller {
         'default/end_html_body',
     ];
     var $data = [];
-    var $group_by, $order_by, $limit, $off_set, $models;
+    var $group_by, $order_by, $limit, $off_set, $model_name;
 
     public function __construct() {
         parent::__construct();
@@ -34,9 +34,9 @@ class BM_Controler extends CI_Controller {
     }
 
 //OVERIDE
-    public function set_model($model, $name = 'model') {
-//        $this->$models[$model] = ['name' => $model];
-        $this->load->model($model, $name);
+    public function set_model($model) {
+        $this->model_name = $model;
+        $this->load->model($model, 'model');
     }
 
     protected function get_data($hook, $data): array {
@@ -72,7 +72,7 @@ class BM_Controler extends CI_Controller {
     protected function cache_delete_db() {
         
     }
-
+    
     protected function form_common() {
         
     }
