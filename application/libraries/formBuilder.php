@@ -47,16 +47,16 @@ class formBuilder {
       Unset all fields from form_structure listed in the excluded_values array
      */
 
-    public function exclude_form_values(array $excluded_values) {
-        foreach ($excluded_values as $value) {
-            if (isset($this->form_structure[$value])) {
-                unset($this->form_structure[$value]);
-            } else {
-                //show error
-                echo 'exclude_form_values array item not found in form_structure';
-            }
-        }
-    }
+//    public function exclude_form_values(array $excluded_values) {
+//        foreach ($excluded_values as $value) {
+//            if (isset($this->form_structure[$value])) {
+//                unset($this->form_structure[$value]);
+//            } else {
+//                //show error
+//                echo 'exclude_form_values array item not found in form_structure';
+//            }
+//        }
+//    }
 
     /*
       Remove all values not in included_values from form_structure
@@ -82,16 +82,16 @@ class formBuilder {
       Set type eq to hidden for values listed in hidden_values
      */
 
-    public function hide_form_values(array $hidden_values) {
-        foreach ($hidden_values as $value) {
-            if (isset($this->form_structure[$value])) {
-                $this->form_structure[$value]['type'] = "hidden";
-            } else {
-                //show error
-                echo 'hide_form_values array item not found in form_structure';
-            }
-        }
-    }
+//    public function hide_form_values(array $hidden_values) {;
+//        foreach ($hidden_values as $value) {
+//            if (isset($this->form_structure[$value])) {
+//                $this->form_structure[$value]['type'] = "hidden";
+//            } else {
+//                //show error
+//                echo 'hide_form_values array item not found in form_structure';
+//            }
+//        }
+//    }
 
     //Determine what build function to use based on the type of field
     private function determine_build($type) {
@@ -167,14 +167,24 @@ class formBuilder {
         $CI->db->escape_str($id);
 
         $CI->db->from($CI->db->dbprefix($tablename));
-        $CI->db->where($CI->db->dbprefix($tablename) . '.' . $CI->db->primary($CI->db->dbprefix($tablename)), $id);
+        if (!is_array($id)) {
+            $CI->db->where($CI->db->dbprefix($tablename) . '.' . $CI->db->primary($CI->db->dbprefix($tablename)), $id);
+        } else {
+            $CI->db->where($id);
+        }
         $query = $CI->db->get();
-        
+
 
         $outputArray = array();
         if ($query->num_rows() == "1") {
             foreach ($query->row_array() as $ky => $val) {
                 $outputArray[$ky] = $val;
+            }
+        } else {
+            foreach ($query->result_array() as $ky => $row) {
+                foreach ($row as $key => $value) {
+                    $outputArray[$ky][$key] = $value;
+                }
             }
         }
 
