@@ -31,7 +31,7 @@ class Bm_form_builder extends formBuilder {
         $this->form_structure[($multiselect) ? $input_name . '[]' : $input_name] = $temp_item;
         $this->form_values[($multiselect) ? $input_name . '[]' : $input_name] = $temp_value;
     }
-
+    
     public function set_extra_for($input_name, $extra) {
         if (isset($this->form_structure[$input_name])) {
             $this->form_structure[$input_name]['extra'] = $extra;
@@ -59,7 +59,7 @@ class Bm_form_builder extends formBuilder {
 
         $selected = (isset($this->form_values[$input_name]) ? $this->form_values[$input_name] : set_value($input_name, ''));
         $this->CI->load->helper('form');
-        return form_dropdown($input_name, $options, $selected, $extra_data);
+        return form_dropdown($input_name, $options, $selected, $extra_data).form_error($input_name) ;
     }
 
     public function build_input_multiselect($input_name, array $input_data) {
@@ -79,10 +79,10 @@ class Bm_form_builder extends formBuilder {
         }
         $selected = (isset($this->form_values[$input_name]) ? $this->form_values[$input_name] : set_value($input_name, []));
         $this->CI->load->helper('form');
-        return form_multiselect($input_name, $options, $selected, $extra_data);
+        return form_multiselect($input_name, $options, $selected, $extra_data).form_error($input_name) ;
     }
 
-    public function build_input_textarea($input_name, array $input_data) {
+    public function build_input_textarea($input_name, array $input_data){
 
         extract($input_data);
         $extra_data = [
@@ -98,7 +98,7 @@ class Bm_form_builder extends formBuilder {
         }
         $value = (isset($this->form_values[$input_name]) ? $this->form_values[$input_name] : set_value($input_name, ''));
         $this->CI->load->helper('form');
-        return form_textarea($input_name, $value, $extra_data);
+        return form_textarea($input_name, $value, $extra_data).form_error($input_name) ;
     }
 
     public function build_input($input_name, array $input_data) {
@@ -116,7 +116,7 @@ class Bm_form_builder extends formBuilder {
             $extra_data = array_merge($extra_data, $extra);
         }
             
-        return form_input($input_name, (isset($this->form_values[$input_name]) ? $this->form_values[$input_name] : set_value($input_name, '')), $extra_data);
+        return form_input($input_name, (isset($this->form_values[$input_name]) ? $this->form_values[$input_name] : set_value($input_name, '')), $extra_data).form_error($input_name) ;
     }
 
     public function search_structure_key($column_key, $value) {

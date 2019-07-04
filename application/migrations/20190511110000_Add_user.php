@@ -134,6 +134,15 @@ class Migration_Add_user extends CI_Migration {
 //                'unsigned' => TRUE,
 //                'auto_increment' => TRUE
             ),
+            'agree_terms' => array(
+                'type' => 'BOOLEAN',
+//                'constraint' => '100',
+//                'null' => TRUE,
+//                'default' => 'King of Town',
+//                'unique' => TRUE,
+//                'unsigned' => TRUE,
+//                'auto_increment' => TRUE
+            ),
         ]);
         $this->dbforge->create_table('user', TRUE, $attributes);
         $this->db->insert('user', [
@@ -141,7 +150,8 @@ class Migration_Add_user extends CI_Migration {
             'last_name' => 'Titanero Guelfi',
             'email' => 'fulvius@gpmail.com.br',
             'passwd' => 'h7t846m2',
-            'id_role' => $administratos_insert_id
+            'id_role' => $administratos_insert_id,
+            'agree_terms' => true,
         ]);
 
         $this->dbforge->add_field('id');

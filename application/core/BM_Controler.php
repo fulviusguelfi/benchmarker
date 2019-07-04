@@ -31,6 +31,7 @@ class BM_Controler extends CI_Controller {
         parent::__construct();
         $this->lang->load('controller/' . static::class, $this->config->item('language'));
         $this->lang->load('controller/BM_Controller', $this->config->item('language'));
+        $this->load->library('form_validation');
     }
 
 //OVERIDE
@@ -62,7 +63,9 @@ class BM_Controler extends CI_Controller {
 
     public function show_form(array $data) {
         if (ENVIRONMENT === 'development') {
-            var_dump($data);
+            echo '<pre>';
+            print_r($data);
+            echo '</pre>';
         }
         foreach ($this->view_sequece as $value) {
             $this->load->view($value, $data);
@@ -72,7 +75,7 @@ class BM_Controler extends CI_Controller {
     protected function cache_delete_db() {
         
     }
-    
+
     protected function form_common() {
         
     }
@@ -110,36 +113,49 @@ class BM_Controler extends CI_Controller {
             $this->data = array_merge($this->data, ['form_action' => $this->uri->uri_string(),]);
             if ($this->uri->segment(3, false)) {
                 //seleciona
-                $this->form_common();
+                $got_form = $this->form_common();
                 $this->data = $this->get_data('seleciona', $this->data);
-                $this->show_form(array_merge($this->data, $this->bm_form_builder->build_form()));
+                $this->data = ($got_form !== false) ? array_merge($this->data, $this->bm_form_builder->build_form()) : $this->data;
+                $this->show_form($this->data);
             } else {
                 //novo init
-                $this->form_common();
+                $got_form = $this->form_common();
                 $this->data = $this->get_data('novo', $this->data);
-                $this->show_form(array_merge($this->data, $this->bm_form_builder->build_form()));
+                $this->data = ($got_form !== false) ? array_merge($this->data, $this->bm_form_builder->build_form()) : $this->data;
+                $this->show_form($this->data);
             }
         } else {
-            if (($this->input->post('id', TRUE) ?? false)) {
-                $this->data = array_merge($this->input->post(null, TRUE), $this->data);
-                //altera
-                $this->data = $this->get_data('altera', $this->data);
-                if (isset($this->model)) {
-                    $this->data = array_merge($this->data, ['altera' => $this->model->upd($this->data)]);
-                } else {
-                    $this->data = array_merge($this->data, ['altera' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
-                }
+            
+            if ($this->form_validation->run() == FALSE) {
+                $this->data['form_erros'] = $this->form_validation->error_array();
+                var_dump($this->data);
+                die;
+                $got_form = $this->form_common();
+                $this->data = $this->get_data('erro', $this->data);
+                $this->data = ($got_form !== false) ? array_merge($this->data, $this->bm_form_builder->build_form()) : $this->data;
+                $this->show_form($this->data);
             } else {
-                $this->data = array_merge($this->input->post(null, TRUE), $this->data);
-                //cria
-                $this->data = $this->get_data('cria', $this->data);
-                if (isset($this->model)) {
-                    $this->data = array_merge($this->data, ['cria' => $this->model->add($this->data)]);
+                if (($this->input->post('id', TRUE) ?? false)) {
+                    $this->data = array_merge($this->input->post(null, TRUE), $this->data);
+                    //altera
+                    $this->data = $this->get_data('altera', $this->data);
+                    if (isset($this->model)) {
+                        $this->data = array_merge($this->data, ['altera' => $this->model->upd($this->data)]);
+                    } else {
+                        $this->data = array_merge($this->data, ['altera' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
+                    }
                 } else {
-                    $this->data = array_merge($this->data, ['cria' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
+                    $this->data = array_merge($this->input->post(null, TRUE), $this->data);
+                    //cria
+                    $this->data = $this->get_data('cria', $this->data);
+                    if (isset($this->model)) {
+                        $this->data = array_merge($this->data, ['cria' => $this->model->add($this->data)]);
+                    } else {
+                        $this->data = array_merge($this->data, ['cria' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
+                    }
                 }
+                $this->show_list($this->data);
             }
-            $this->show_list($this->data);
         }
     }
 

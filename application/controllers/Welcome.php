@@ -24,6 +24,10 @@ class Welcome extends BM_Controler {
     public function __construct() {
         parent::__construct();
     }
+    
+    protected function form_common() {
+        return false;
+    }
 
     protected function get_data($hook, $data): array {
         $data = array_merge($data, ['page_title' => $this->lang->line('Welcome')]);
@@ -33,10 +37,10 @@ class Welcome extends BM_Controler {
             
         } elseif ($hook === 'seleciona') {
             
-        } elseif ($hook === 'altera') {
+        } elseif ($hook === 'novo') {
             
-        } elseif ($hook === 'cria') {
-            
+        } elseif ($hook === 'altera' || $hook === 'cria' || $hook === 'remove') {
+            unset($data['submit']);
         }
         return parent::get_data($hook, $data);
     }
@@ -44,6 +48,11 @@ class Welcome extends BM_Controler {
     public function show_list(array $data, bool $retrn_as_data = FALSE) {
         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'welcome/main']);
         parent::show_list($data, $retrn_as_data);
+    }
+
+    public function show_form(array $data) {
+        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'welcome/main']);
+        parent::show_list($data);
     }
 
 }
