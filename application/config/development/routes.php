@@ -60,7 +60,10 @@ if (ENVIRONMENT === 'development') {
 $route['dashboard'] = 'dashboard/index';
 $route['login'] = 'login/modify';
 $route['singup'] = 'singup/modify';
+$route['logout'] = 'logout/modify';
 $route['reset_password'] = 'reset_password/modify';
+$route['new_password/(:any)'] = 'reset_password/modify/$1';
+$route['new_password/(.+)'] = 'reset_password/modify/$1';
 
 $route['role'] = 'role_maintence/index';
 $route['role/modify'] = 'role_maintence/modify';

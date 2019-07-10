@@ -46,6 +46,12 @@ class Migration_Add_user extends CI_Migration {
         $this->lang->load('table/role', $this->config->item('language'));
         $this->lang->load('table/behavior', $this->config->item('language'));
         $this->db->cache_delete_all();
+        $this->load->library('encryption');
+        $this->encryption->initialize(
+                array(
+                    'cipher' => 'aes-256',
+                )
+        );
     }
 
     public function up() {
@@ -138,7 +144,7 @@ class Migration_Add_user extends CI_Migration {
                 'type' => 'BOOLEAN',
 //                'constraint' => '100',
 //                'null' => TRUE,
-//                'default' => 'King of Town',
+                'default' => FALSE,
 //                'unique' => TRUE,
 //                'unsigned' => TRUE,
 //                'auto_increment' => TRUE
@@ -149,7 +155,7 @@ class Migration_Add_user extends CI_Migration {
             'first_name' => 'Fulvius',
             'last_name' => 'Titanero Guelfi',
             'email' => 'fulvius@gpmail.com.br',
-            'passwd' => 'h7t846m2',
+            'passwd' => $this->encryption->encrypt('h7t846m2'),
             'id_role' => $administratos_insert_id,
             'agree_terms' => true,
         ]);

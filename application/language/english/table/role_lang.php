@@ -1,4 +1,0 @@
-<?php
-
-$lang['Administrator'] = 'Administrator';
-

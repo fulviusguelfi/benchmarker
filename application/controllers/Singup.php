@@ -33,13 +33,20 @@ class Singup extends BM_Controler {
 
     protected function form_common() {
         $this->bm_form_builder->assign_vars('user', null);
-        $this->bm_form_builder->exclude_form_values(['id_role', 'id', 'agree_terms']);
+        $this->bm_form_builder->exclude_form_values(['id']);
+        $this->bm_form_builder->hide_form_values(['id_role']);
+        $this->load->model('role');
+        $this->bm_form_builder->set_value('id_role', $this->role->get_default_role_id());
         $this->bm_form_builder->set_extra_for('first_name', ['placeholder' => $this->lang->line('First Name'), 'class' => 'form-control login']);
         $this->bm_form_builder->set_extra_for('last_name', ['placeholder' => $this->lang->line('Last Name'), 'class' => 'form-control login']);
         $this->bm_form_builder->set_extra_for('email', ['placeholder' => $this->lang->line('Email'), 'class' => 'form-control login']);
         $this->bm_form_builder->set_extra_for('passwd', ['placeholder' => $this->lang->line('Password'), 'class' => 'form-control login']);
-//        $this->bm_form_builder->include_form_values(['confirm_passwd']);
-//        $this->bm_form_builder->set_extra_for('confirm_passwd', ['placeholder' => '', 'class' => 'form-control']);
+        $this->bm_form_builder->set_password_type('passwd');
+        $this->bm_form_builder->set_extra_for('agree_terms', ['class' => "field login-checkbox", 'tabindex' => "4"]);
+        $this->bm_form_builder->add_special_label('agree_terms', $this->lang->line('Agree with the Terms & Conditions.'));
+        $this->bm_form_builder->add_form_values('confirm_passwd');
+        $this->bm_form_builder->set_password_type('confirm_passwd');
+        $this->bm_form_builder->set_extra_for('confirm_passwd', ['placeholder' => $this->lang->line('Confirm Password'), 'class' => 'form-control']);
     }
 
     protected function cache_delete_db() {
@@ -53,14 +60,9 @@ class Singup extends BM_Controler {
             
         } elseif ($hook === 'busca') {
             
-        } elseif ($hook === 'seleciona') {
+        } elseif ($hook === 'seleciona' || $hook === 'erro_seleciona') {
             
-        } elseif ($hook === 'novo') {
-            $data = array_merge($data, [
-                'form_title' => $this->lang->line('Signup for Free Account'),
-                'form_description' => $this->lang->line('Create your free account:'),
-            ]);
-        } elseif ($hook === 'erro') {
+        } elseif ($hook === 'novo' || $hook === 'erro_novo') {
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Signup for Free Account'),
                 'form_description' => $this->lang->line('Create your free account:'),
@@ -70,8 +72,6 @@ class Singup extends BM_Controler {
             unset($data['page_title']);
             unset($data['confirm_passwd']);
             $data['passwd'] = $this->encryption->encrypt($data['passwd']);
-            var_dump($data);
-            die;
             $this->set_model('user');
         }
         return parent::get_data($hook, $data);
@@ -79,10 +79,16 @@ class Singup extends BM_Controler {
 
     public function show_form(array $data) {
         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/head', $this->view_sequece) => 'login/head']);
-        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/javascript', $this->view_sequece) => 'login/javascript']);
+        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/javascript', $this->view_sequece) => 'singup/javascript']);
         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/nav_bar', $this->view_sequece) => 'singup/nav_bar']);
         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'singup/form']);
         parent::show_form($data);
+    }
+
+    public function show_list(array $data) {
+        if (array_key_exists('cria', $data)) {
+            redirect('login');
+        }
     }
 
 }

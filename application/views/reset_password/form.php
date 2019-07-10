@@ -3,7 +3,7 @@
 
     <div class="content clearfix">
 
-        <?= form_open('', ['id' => 'from_login', 'method' => 'post'], []) ?>
+        <?= form_open($form_action, ['id' => 'reset_password', 'method' => 'post'], ($form_hidden_values ?? [])) ?>
 
         <h1><?= ($form_title ?? '') ?></h1>
 
@@ -22,17 +22,7 @@
 
         <div class="login-actions">
 
-            <span class="login-checkbox">
-                <?php
-                $label_text = $this->lang->line('Agree with the Terms & Conditions.');
-                $id = 'agree-terms';
-                $name = 'agree_terms';
-                ?>
-                <?= form_checkbox($name, true, set_value($name, false), ['id' => $id, 'class' => "field login-checkbox", 'tabindex' => "4"]) ?>
-                <?= form_label($label_text, $id, ['class' => "choice"]) ?>
-            </span>
-
-            <?= form_submit('submit', $this->lang->line('Register'), ['class' => 'button btn btn-success btn-large']) ?>
+            <?= form_submit('submit', $this->lang->line('Reset Password'), ['class' => 'button btn btn-success btn-large']) ?>
         </div> <!-- .actions -->
 
         <?= form_close() ?>

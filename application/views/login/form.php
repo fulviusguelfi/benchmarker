@@ -3,7 +3,7 @@
 
     <div class="content clearfix">
 
-        <?= form_open('', ['id' => 'from_login', 'method' => 'post'], []) ?>
+        <?= form_open('', ['id' => 'from_login', 'method' => 'post'], ($form_hidden_values ?? [])) ?>
 
         <h1><?= ($form_title ?? '') ?></h1>
 
@@ -21,17 +21,7 @@
         </div> <!-- /login-fields -->
 
         <div class="login-actions">
-
-            <span class="login-checkbox">
-                <?php
-                $label_text = $this->lang->line('Keep me signed in');
-                $id = 'keep-signed';
-                $name = 'keep_signed';
-                ?>
-                <?= form_checkbox($name, true, set_value($name, false), ['id' => $id, 'class' => "field login-checkbox", 'tabindex' => "4"]) ?>
-                <?= form_label($label_text, $id, ['class' => "choice"]) ?>
-            </span>
-
+            <span class="login-checkbox"></span>
             <?= form_submit('submit', $this->lang->line('Sign In'), ['class' => 'button btn btn-success btn-large']) ?>
         </div> <!-- .actions -->
 

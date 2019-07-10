@@ -3,51 +3,31 @@
 
     <div class="content clearfix">
 
-        <?= form_open('', ['id' => 'from_login', 'method' => 'post'], []) ?>
+        <?= form_open('', ['id' => 'from_login', 'method' => 'post'], $form_hidden_values) ?>
 
         <h1><?= ($form_title ?? '') ?></h1>
 
         <div class="login-fields">
 
             <p><?= ($form_description ?? '') ?></p>
-            
+
             <?php foreach ($display_values as $key => $value) : ?>
                 <div class="field">
                     <?= $key ?>
                     <?= $value ?>
                 </div>
             <?php endforeach; ?>
-                <div class="field">
-                    <?php 
-                    $input_name = 'confirm_passwd';
-                    $extra_data = ['placeholder' => $this->lang->line('Confirm Password'), 'class' => 'form-control login']
-                    ?>
-                    <?= form_input($input_name, set_value($input_name, ''), $extra_data) ?>
-                </div>
-
         </div> <!-- /login-fields -->
-
         <div class="login-actions">
-
-            <span class="login-checkbox">
-                <?php
-                $label_text = $this->lang->line('Agree with the Terms & Conditions.');
-                $id = 'agree-terms';
-                $name = 'agree_terms';
-                ?>
-                <?= form_checkbox($name, true, set_value($name, false), ['id' => $id, 'class' => "field login-checkbox", 'tabindex' => "4"]) ?>
-                <?= form_label($label_text, $id, ['class' => "choice"]) ?>
-            </span>
-
+            <span class="login-checkbox"></span>
             <?= form_submit('submit', $this->lang->line('Register'), ['class' => 'button btn btn-success btn-large']) ?>
         </div> <!-- .actions -->
 
         <?= form_close() ?>
-<?php echo validation_errors('<div class="error">', '</div>'); ?>
     </div> <!-- /content -->
 
 </div> <!-- /account-container -->
 
 <div class="login-extra">
-    <?=$this->lang->line('Already have an account?') . ' '. anchor('login', $this->lang->line('Login to your account'), []) ?>
+    <?= $this->lang->line('Already have an account?') . ' ' . anchor('login', $this->lang->line('Login to your account'), []) ?>
 </div> <!-- /login-extra -->

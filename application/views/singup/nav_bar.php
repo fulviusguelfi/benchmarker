@@ -27,7 +27,7 @@
                         <?= anchor('login', $this->lang->line('Already have an account? Login now'), []) ?>
                     </li>
                     <li class="">
-                        <?= anchor('welcome', '<i class="icon-chevron-left"></i>' . $this->lang->line('Back to Homepage'), []) ?>
+                        <?= anchor('', '<i class="icon-chevron-left"></i>' . $this->lang->line('Back to Homepage'), []) ?>
                     </li>
                 </ul>
 

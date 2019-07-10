@@ -27,7 +27,7 @@
                         <?= anchor('singup', $this->lang->line("Don't have an account?"), []) ?>
                     </li>
                     <li class="">						
-                        <?= anchor('welcome', '<i class="icon-chevron-left"></i>' . $this->lang->line('Back to Homepage'), []) ?>
+                        <?= anchor('', '<i class="icon-chevron-left"></i>' . $this->lang->line('Back to Homepage'), []) ?>
                     </li>
                 </ul>
 

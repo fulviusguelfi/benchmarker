@@ -14,6 +14,6 @@
 class Element extends BM_Model{
     public const TABLE_NAME = 'element';
     public const JOIN_TABLES = [
-        ['table' => permission::TABLE_NAME, 'on' => 'id'],
+        ['table' => Permission::TABLE_NAME, 'on' => 'id'],
     ];
 }

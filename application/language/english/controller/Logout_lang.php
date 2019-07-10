@@ -6,5 +6,3 @@
  * and open the template in the editor.
  */
 
-$lang['Hide'] = 'Hide';
-$lang['Read Only'] = 'Read Only';

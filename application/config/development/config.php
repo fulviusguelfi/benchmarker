@@ -333,7 +333,7 @@ $config['cache_query_string'] = FALSE;
   | https://codeigniter.com/user_guide/libraries/encryption.html
   |
  */
-$config['encryption_key'] = '';
+$config['encryption_key'] = hex2bin('0cc465565e40f87f184103220c4262d6773d2d2f80749e58e93e5abf88ff22d0');
 
 /*
   |--------------------------------------------------------------------------
@@ -540,7 +540,9 @@ $config['sess_save_path'] = sys_get_temp_dir();
 //pagination
 $config['per_page'] = 20;
 
-$config['encryption_key'] = hex2bin('0cc465565e40f87f184103220c4262d6773d2d2f80749e58e93e5abf88ff22d0');
+//segments permited by default
+$config['default_permited'] = ['login','singup','reset_password/modify'];
+
 
 
 $autoload_function = function ($class) {

@@ -24,25 +24,6 @@ class formBuilder {
         }
     }
 
-    public function build_form() {
-
-        //instantiate return values
-        $return_values = array();
-
-        //loop through form structure and output values
-        foreach ($this->form_structure as $key => $value) {
-            //Set build function to call
-            $build_type = $this->determine_build($value['type']);
-
-            if ($value['type'] == 'hidden') {
-                $return_values["form_hidden_values"][$value['id']] = (isset($this->form_values[$value['id']]) ? $this->form_values[$value['id']] : '');
-            } else {
-                $return_values["display_values"][form_label($this->pretty_label($key), $key, ['class' => 'col-form-label'])] = $this->$build_type($key, $value);
-            }
-        }
-        return $return_values;
-    }
-
     /*
       Unset all fields from form_structure listed in the excluded_values array
      */
@@ -94,7 +75,7 @@ class formBuilder {
     }
 
     //Determine what build function to use based on the type of field
-    private function determine_build($type) {
+    protected function determine_build($type) {
 
         switch ($type) {
             case 'text':
@@ -125,11 +106,7 @@ class formBuilder {
 
         $returnArray = array();
         foreach ($fields as $ky => $val) {
-//             print_r($ky);
-//             print_r($val);
-//             var_dump($val);
             // First, handle the field type
-            $val->name = $val->name;
             switch ($val->type) {
                 case "varchar":
                     $returnArray[$val->name]["type"] = "text";
@@ -139,6 +116,9 @@ class formBuilder {
                     break;
                 case "text":
                     $returnArray[$val->name]["type"] = "textarea";
+                    break;
+                case "tinyint":
+                    $returnArray[$val->name]["type"] = "boolean";
                     break;
                 default:
                     $returnArray[$val->name]["type"] = "text";
@@ -154,7 +134,7 @@ class formBuilder {
             $returnArray[$val->name]["placeholder"] = str_replace("_", " ", $val->name);
 
             // Set whether its required
-            $returnArray[$val->name]["required"] = null;
+            $returnArray[$val->name]["primary_key"] = $val->primary_key;
         }
         return $returnArray;
     }
@@ -254,20 +234,6 @@ class formBuilder {
         } else {
             return $value;
         }
-    }
-
-    private function pretty_label($value) {
-        $CI = & get_instance();
-        $value = str_replace("_", " ", $value);
-        $value = str_replace("[]", "", $value);
-        $exit = '';
-        foreach (str_word_count($value, 2) as $key => $str_part) {
-            if ($key === 0 && $CI->db->table_exists($str_part)) {
-                continue;
-            }
-            $exit .= ucfirst($str_part) . ' ';
-        }
-        return $exit;
     }
 
 }

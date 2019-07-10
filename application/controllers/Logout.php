@@ -4,7 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 //include_once(APPPATH.'core/BM_Controller.php');
 
-class Welcome extends BM_Controler {
+class Logout extends BM_Controler {
+
+    protected $redirect_uri = '';
 
     /**
      * Index Page for this controller.
@@ -24,38 +26,41 @@ class Welcome extends BM_Controler {
     public function __construct() {
         parent::__construct();
     }
-    
+
     protected function form_common() {
         return false;
     }
 
+//    protected function cache_delete_db() {
+//        $this->db->cache_delete('logout', 'index');
+//        $this->db->cache_delete('logout', 'modify');
+//    }
+
     protected function get_data($hook, $data): array {
-        $data = array_merge($data, ['page_title' => $this->lang->line('Welcome')]);
+        $data = array_merge($data, ['page_title' => $this->lang->line('Login')]);
         if ($hook === 'lista') {
             
         } elseif ($hook === 'busca') {
             
         } elseif ($hook === 'seleciona') {
             
-        } elseif ($hook === 'novo') {
-            
+        } elseif ($hook === 'novo' || $hook === 'erro_novo') {
+            $this->session->sess_destroy();
         } elseif ($hook === 'altera' || $hook === 'cria' || $hook === 'remove') {
-            unset($data['submit']);
+            
         }
         return parent::get_data($hook, $data);
     }
 
-//    public function show_list(array $data) {
-//        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'welcome/main']);
-//        var_dump($this->view_sequece);
-//                die;
-//        parent::show_list($data);
-//    }
-
     public function show_form(array $data) {
-        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/nav_bar', $this->view_sequece) => 'welcome/nav_bar']);
-        $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'welcome/main']);
-        parent::show_list($data);
+        redirect($this->redirect_uri);
     }
 
+//    public function show_list(array $data) {
+//        if (array_key_exists('is_valid_user', $data) && $data['is_valid_user']) {
+//            redirect($this->redirect_uri);
+//        } else {
+//            redirect('login');
+//        }
+//    }
 }

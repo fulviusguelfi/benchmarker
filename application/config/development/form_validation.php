@@ -7,15 +7,15 @@
  */
 
 $config = array(
-        'signup' => array(
+        'singup' => array(
                 array(
                         'field' => 'first_name',
-                        'label' => 'lang:First Name',
+                        'label' => 'lang:First_Name',
                         'rules' => 'required'
                 ),
                 array(
                         'field' => 'last_name',
-                        'label' => 'lang:Last Name',
+                        'label' => 'lang:Last_Name',
                         'rules' => 'required'
                 ),
                 array(
@@ -29,27 +29,24 @@ $config = array(
                         'rules' => 'required'
                 ),
                 array(
+                        'field' => 'agree_terms',
+                        'label' => 'lang:Agree_with_the_Terms_&_Conditions.',
+                        'rules' => 'required'
+                ),
+                array(
                         'field' => 'confirm_passwd',
-                        'label' => 'lang:Confirm Password',
+                        'label' => 'lang:Confirm_Password',
                         'rules' => 'required|matches[passwd]'
                 ),
         ),
-        'signup/modify' => array(
-                array(
-                        'field' => 'first_name',
-                        'label' => 'lang:First Name',
-                        'rules' => 'required'
-                ),
-                array(
-                        'field' => 'last_name',
-                        'label' => 'lang:Last Name',
-                        'rules' => 'required'
-                ),
+        'reset_password' => array(
                 array(
                         'field' => 'email',
                         'label' => 'lang:Email',
                         'rules' => 'required|valid_email'
                 ),
+        ),
+        'reset_password/modify' => array(
                 array(
                         'field' => 'passwd',
                         'label' => 'lang:Password',
@@ -57,7 +54,7 @@ $config = array(
                 ),
                 array(
                         'field' => 'confirm_passwd',
-                        'label' => 'lang:Confirm Password',
+                        'label' => 'lang:Confirm_Password',
                         'rules' => 'required|matches[passwd]'
                 ),
         ),

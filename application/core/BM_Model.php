@@ -19,19 +19,14 @@ class BM_Model extends CI_Model {
         parent::__construct();
         $this->load->database();
         $this->db->flush_cache();
-        $cl_name = static::class;
-        if (file_exists(APPPATH . 'model/' . $cl_name . '_lang.php')) {
-            $this->lang->load('model/' . $cl_name, $this->config->item('language'));
-        }
+        $this->lang->load('models/' . static::class, $this->config->item('language'));
+        $this->lang->load('models/BM_Model', $this->config->item('language'));
         if ($this->db->table_exists($this->db->dbprefix(static::TABLE_NAME))) {
             if (!empty(static::JOIN_TABLES)) {
                 $this->count_all = $this->__count_joined();
             } else {
                 $this->count_all = $this->db->count_all($this->db->dbprefix(static::TABLE_NAME));
             }
-//            $this->db->start_cache();
-//            $this->db->from($this->db->dbprefix(static::TABLE_NAME));
-//            $this->db->stop_cache();
         } else {
             show_error(sprintf($this->lang->line('Table %s not found'), static::TABLE_NAME));
         }
@@ -96,7 +91,7 @@ class BM_Model extends CI_Model {
         }
         $the_id = $value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))];
         unset($value[$this->db->primary($this->db->dbprefix(static::TABLE_NAME))]);
-        $result = $this->db->update(static::TABLE_NAME, $value, $this->db->primary($this->db->dbprefix(static::TABLE_NAME))." = ".$the_id);
+        $result = $this->db->update(static::TABLE_NAME, $value, $this->db->primary($this->db->dbprefix(static::TABLE_NAME)) . " = " . $the_id);
         if ($result) {
             $this->update_id = $the_id;
         } else {
@@ -111,6 +106,7 @@ class BM_Model extends CI_Model {
         $this->db->start_cache();
         if (is_array($where)) {
             $this->db->where($where);
+            $limit = $this->count_all;
         } else {
             $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
             $limit = 1;
@@ -118,7 +114,7 @@ class BM_Model extends CI_Model {
         $this->db->stop_cache();
         return $this->list($limit, $offset, $oreder_by, $group_by);
     }
-    
+
     public function domain_list(array $fields, $oreder_by = NULL, $group_by = null): array {
         $limit = $this->count_all;
         $offset = 0;
@@ -147,6 +143,7 @@ class BM_Model extends CI_Model {
         $this->db->distinct($distinct);
         if (is_array($where)) {
             $this->db->where($where);
+            $limit = $this->count_all;
         } else {
             $this->db->where($this->db->dbprefix(static::TABLE_NAME) . '.' . $this->db->primary($this->db->dbprefix(static::TABLE_NAME)), $where);
             $limit = 1;

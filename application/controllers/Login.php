@@ -6,6 +6,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Login extends BM_Controler {
 
+//    protected $redirect_uri = 'dashboard';
+    protected $redirect_uri = 'dashboard';
+
     /**
      * Index Page for this controller.
      *
@@ -27,9 +30,12 @@ class Login extends BM_Controler {
 
     protected function form_common() {
         $this->bm_form_builder->assign_vars('user', null);
-        $this->bm_form_builder->exclude_form_values(['first_name', 'last_name', 'id_role', 'id']);
+        $this->bm_form_builder->exclude_form_values(['first_name', 'last_name', 'id_role', 'id', 'agree_terms']);
         $this->bm_form_builder->set_extra_for('email', ['placeholder' => $this->lang->line('Email'), 'class' => 'form-control login username-field']);
         $this->bm_form_builder->set_extra_for('passwd', ['placeholder' => $this->lang->line('Password'), 'class' => 'form-control login password-field']);
+        $this->bm_form_builder->add_form_values('keep_signed', ['type' => 'boolean']);
+        $this->bm_form_builder->set_extra_for('keep_signed', ['class' => "field login-checkbox", 'tabindex' => "4"]);
+        $this->bm_form_builder->add_special_label('keep_signed', $this->lang->line('Keep me signed in.'));
     }
 
     protected function cache_delete_db() {
@@ -45,15 +51,33 @@ class Login extends BM_Controler {
             
         } elseif ($hook === 'seleciona') {
             
+        } elseif ($hook === 'erro_novo') {
+            var_dump($data);
+            echo 'erro_novo';
+            die;
         } elseif ($hook === 'novo') {
             $data = array_merge($data, [
                 'form_title' => $this->lang->line('Member Login'),
                 'form_description' => $this->lang->line('Please provide your details'),
             ]);
-        } elseif ($hook === 'altera' || $hook === 'cria' || $hook === 'remove') {
+        } elseif ($hook === 'altera' || $hook === 'remove') {
+            
+        } elseif ($hook === 'cria') {
             unset($data['submit']);
-            var_dump($data);
-            die;
+            unset($data['page_title']);
+            //redirection control if no keep_signed
+//            $is_redirect = isset($data['tried_uri']);
+//            if ($is_redirect) {
+//                $this->redirect_uri = $data['tried_uri'];
+//                unset($data['tried_uri']);
+//            }
+            //verify validation
+            $this->load->model('user');
+            $is_valid_user = $this->user->is_valid_user($data);
+            if ($is_valid_user) {
+                $data['is_valid_user'] = $is_valid_user;
+//                $this->session->set_flashdata('is_redirect', $is_redirect);
+            }
         }
         return parent::get_data($hook, $data);
     }
@@ -64,6 +88,14 @@ class Login extends BM_Controler {
         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/nav_bar', $this->view_sequece) => 'login/nav_bar']);
         $this->view_sequece = array_replace($this->view_sequece, [array_search('default/main', $this->view_sequece) => 'login/form']);
         parent::show_form($data);
+    }
+
+    public function show_list(array $data) {
+        if (array_key_exists('is_valid_user', $data) && $data['is_valid_user']) {
+            redirect($this->redirect_uri);
+        } else {
+            redirect('login');
+        }
     }
 
 }

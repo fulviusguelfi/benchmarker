@@ -32,6 +32,7 @@ class BM_Controler extends CI_Controller {
         $this->lang->load('controller/' . static::class, $this->config->item('language'));
         $this->lang->load('controller/BM_Controller', $this->config->item('language'));
         $this->load->library('form_validation');
+        $this->load->helper(['url']);
     }
 
 //OVERIDE
@@ -83,7 +84,7 @@ class BM_Controler extends CI_Controller {
 //OVERIDE
 
     public function index() {
-        $this->off_set = $this->uri->segment(3, 0);
+        $this->off_set = $this->uri->rsegment(3, 0);
         $this->limit = ($this->input->post('limit') ?? $this->config->item('per_page'));
         $this->order_by = ($this->input->post('oreder_by', TRUE) ?? NULL);
         $this->group_by = ($this->input->post('group_by', TRUE) ?? NULL);
@@ -110,8 +111,8 @@ class BM_Controler extends CI_Controller {
 
     public function modify() {
         if (empty($this->input->post())) {
-            $this->data = array_merge($this->data, ['form_action' => $this->uri->uri_string(),]);
-            if ($this->uri->segment(3, false)) {
+            $this->data = array_merge($this->data, ['form_action' => $this->uri->uri_string()]);
+            if ($this->uri->rsegment(3, false)) {
                 //seleciona
                 $got_form = $this->form_common();
                 $this->data = $this->get_data('seleciona', $this->data);
@@ -125,18 +126,30 @@ class BM_Controler extends CI_Controller {
                 $this->show_form($this->data);
             }
         } else {
+            $form_validation_group = $this->uri->segment(1);
+            if ($this->uri->segment(2, false) && $this->uri->rsegment(2) === $this->uri->segment(2)) {
+                $form_validation_group = $this->uri->slash_segment(1) . $this->uri->segment(2);
+            }
+            $this->form_validation->run($form_validation_group);
             
-            if ($this->form_validation->run() == FALSE) {
+            //push post in data
+            $this->data = array_merge($this->input->post(null, TRUE), $this->data);
+            
+            if (count($this->form_validation->error_array()) > 0) {
+                $this->data = array_merge($this->data, ['form_action' => $this->uri->uri_string()]);
                 $this->data['form_erros'] = $this->form_validation->error_array();
-                var_dump($this->data);
-                die;
                 $got_form = $this->form_common();
-                $this->data = $this->get_data('erro', $this->data);
+                if (($this->input->post('id', TRUE) ?? false)) {
+                    //seleciona
+                    $this->data = $this->get_data('erro_seleciona', $this->data);
+                } else {
+                    //novo
+                    $this->data = $this->get_data('erro_novo', $this->data);
+                }
                 $this->data = ($got_form !== false) ? array_merge($this->data, $this->bm_form_builder->build_form()) : $this->data;
                 $this->show_form($this->data);
             } else {
                 if (($this->input->post('id', TRUE) ?? false)) {
-                    $this->data = array_merge($this->input->post(null, TRUE), $this->data);
                     //altera
                     $this->data = $this->get_data('altera', $this->data);
                     if (isset($this->model)) {
@@ -145,7 +158,6 @@ class BM_Controler extends CI_Controller {
                         $this->data = array_merge($this->data, ['altera' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
                     }
                 } else {
-                    $this->data = array_merge($this->input->post(null, TRUE), $this->data);
                     //cria
                     $this->data = $this->get_data('cria', $this->data);
                     if (isset($this->model)) {
@@ -161,11 +173,11 @@ class BM_Controler extends CI_Controller {
 
     public function remove() {
         if (empty($this->input->post())) {
-            if ($this->uri->segment(3, false)) {
+            if ($this->uri->rsegment(3, false)) {
                 //remove
                 $this->data = $this->get_data('remove', $this->data);
                 if (isset($this->model)) {
-                    $this->data = array_merge($this->data, ['remove' => $this->model->del($this->uri->segment(3))]);
+                    $this->data = array_merge($this->data, ['remove' => $this->model->del($this->uri->rsegment(3))]);
                 } else {
                     $this->data = array_merge($this->data, ['remove' => $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method')]);
                     log_message('error', $this->lang->line('Model class was not seted, please use $this-set_model($model) to set it in __constructor method'));
